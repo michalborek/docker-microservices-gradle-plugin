@@ -1,0 +1,51 @@
+apply plugin: 'groovy'
+apply plugin: 'com.gradle.plugin-publish'
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile gradleApi()
+  compile localGroovy()
+}
+
+
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
+  }
+}
+
+
+
+version = '1.0'
+group = 'pl.greenpath.gradle.dockermicroservices'
+
+pluginBundle {
+  website = 'https://github.com/michalborek/docker-microservices-gradle-plugin'
+  vcsUrl = 'https://github.com/michalborek/docker-microservices-gradle-plugin'
+  description = 'Microservices gradle plugin'
+  tags = ['docker', 'microservices']
+
+  plugins {
+    greetingsPlugin {
+      id = 'pl.greenpath.gradle.docker.microservices'
+      displayName = 'Docker Microservices Plugin'
+    }
+  }
+}
+
+
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.4'
+}
+
+
+
