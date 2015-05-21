@@ -11,7 +11,7 @@ class DockerRemoveImageTask extends AbstractDockerTask {
   @TaskAction
   protected void exec() {
     println 'Removing image: ' + getImageName()
-    Object.args 'rmi', getImageName()
-    Object.exec()
+    super.args('rmi', getImageName())
+    super.exec()
   }
 }
