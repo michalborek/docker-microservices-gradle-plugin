@@ -1,4 +1,4 @@
-package com.nokia.csd.gradle
+package pl.greenpath.gradle
 
 class DockerExtension {
   List<String> linkedMicroservices = []

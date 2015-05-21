@@ -1,4 +1,4 @@
-package com.nokia.csd.gradle
+package pl.greenpath.gradle
 
 import org.gradle.api.tasks.Exec
 

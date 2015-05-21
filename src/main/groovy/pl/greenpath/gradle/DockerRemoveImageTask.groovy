@@ -1,4 +1,4 @@
-package com.nokia.csd.gradle
+package pl.greenpath.gradle
 
 import org.gradle.api.tasks.TaskAction
 
@@ -11,7 +11,7 @@ class DockerRemoveImageTask extends AbstractDockerTask {
   @TaskAction
   protected void exec() {
     println 'Removing image: ' + getImageName()
-    super.args 'rmi', getImageName()
-    super.exec()
+    Object.args 'rmi', getImageName()
+    Object.exec()
   }
 }
