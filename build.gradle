@@ -23,7 +23,7 @@ dependencies {
   testCompile 'org.spockframework:spock-core:1.0-groovy-2.3'
 }
 
-version = '1.4.0'
+version = '1.4.1'
 group = 'pl.greenpath.gradle.dockermicroservices'
 
 pluginBundle {
