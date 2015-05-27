@@ -7,6 +7,7 @@ This is a first draft of gradle plugin that allows to start many docker containe
 Usage TBD
 
 To configure the plugin, use the 'docker' extension block:
+
     docker {
       //port to be published to host (mandatory)
       port = 8080
