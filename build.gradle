@@ -21,7 +21,7 @@ dependencies {
   compile localGroovy()
 }
 
-version = '1.4'
+version = '1.4-SNAPSHOT'
 group = 'pl.greenpath.gradle.dockermicroservices'
 
 pluginBundle {
