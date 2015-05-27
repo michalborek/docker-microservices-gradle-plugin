@@ -6,4 +6,5 @@ class DockerExtension {
   String containerName
   String imageName
   List<String> runExtraArgs = []
+  boolean runDetached = true
 }
