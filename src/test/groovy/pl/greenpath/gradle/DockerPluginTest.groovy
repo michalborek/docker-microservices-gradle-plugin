@@ -40,6 +40,16 @@ class DockerPluginTest extends Specification {
     dependsOnDockerRunOf link2Project
   }
 
+  def "should attach 'docker' extension to project"() {
+    given:
+    def plugin = new DockerPlugin()
+    when:
+    plugin.apply(rootProject)
+    then:
+    rootProject.docker instanceof DockerExtension
+
+  }
+
   private void dependsOnDockerRunOf(Project project) {
     def task = getDockerRunTask project
     def dockerRunTask = rootProject.getTasksByName('dockerRun', false)[0]
