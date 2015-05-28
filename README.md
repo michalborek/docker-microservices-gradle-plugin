@@ -1,6 +1,6 @@
 # docker-microservices-gradle-plugin
 
-[![Build Status](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin.svg)](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin)
+[![Build Status](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin.svg)](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin) [![Coverage Status](https://coveralls.io/repos/michalborek/docker-microservices-gradle-plugin/badge.svg?branch=master)](https://coveralls.io/r/michalborek/docker-microservices-gradle-plugin?branch=master)
 
 This is a first draft of gradle plugin that allows to start many docker containers at once in specified order.
 
