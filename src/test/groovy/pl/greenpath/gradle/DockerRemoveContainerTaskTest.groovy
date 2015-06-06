@@ -12,6 +12,15 @@ class DockerRemoveContainerTaskTest extends Specification {
     rootProject = ProjectBuilder.builder().withName('testProject').build()
   }
 
+  def "should have set 'docker' as a default executable of the task"() {
+    given:
+    new DockerPlugin().apply(rootProject)
+    when:
+    DockerRemoveContainerTask removeContainerTask = rootProject.getTasksByName('dockerRemoveContainer', false)[0]
+    then:
+    removeContainerTask.getExecutable() == 'docker'
+  }
+
   def "should run 'rm' on docker's container"() {
     given:
     new DockerPlugin().apply(rootProject)

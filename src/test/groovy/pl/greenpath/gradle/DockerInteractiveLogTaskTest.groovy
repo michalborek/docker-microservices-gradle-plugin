@@ -12,14 +12,23 @@ class DockerInteractiveLogTaskTest extends Specification {
     rootProject = ProjectBuilder.builder().withName('testProject').build()
   }
 
+  def "should have set 'docker' as a default executable of the task"() {
+    given:
+    new DockerPlugin().apply(rootProject)
+    when:
+    DockerInteractiveLogTask task = rootProject.getTasksByName('dockerLogs', false)[0]
+    then:
+    task.getExecutable() == 'docker'
+  }
+
   def "should run interactive docker logs for given project"() {
     given:
     new DockerPlugin().apply(rootProject)
-    DockerInteractiveLogTask dockerLogsTask = rootProject.getTasksByName('dockerLogs', false)[0]
-    dockerLogsTask.executable 'echo'
+    DockerInteractiveLogTask task = rootProject.getTasksByName('dockerLogs', false)[0]
+    task.executable 'echo'
     when:
-    dockerLogsTask.exec()
+    task.exec()
     then:
-    dockerLogsTask.getArgs() == ['logs', '-f', 'testProject']
+    task.getArgs() == ['logs', '-f', 'testProject']
   }
 }
