@@ -7,7 +7,11 @@ abstract class AbstractDockerTask extends Exec {
   public static final String GROUP_NAME = 'docker'
 
   protected AbstractDockerTask() {
-    executable 'docker'
+    this('docker')
+  }
+
+  protected AbstractDockerTask(String functionToExec) {
+    executable functionToExec
     setGroup(GROUP_NAME)
   }
 
