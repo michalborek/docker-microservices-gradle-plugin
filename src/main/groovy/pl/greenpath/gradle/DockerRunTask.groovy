@@ -12,4 +12,12 @@ class DockerRunTask extends AbstractDockerTask {
     println 'Running container: ' + getContainerName() + ' args: ' + super.getArgs()
     super.exec()
   }
+
+  private List<String> getLinkedMicroservices() {
+    return project.extensions.docker.linkedMicroservices.collect {
+      def linkName = it.replaceAll('/', '-')
+      "--link=$linkName:$linkName"
+    }
+  }
+
 }

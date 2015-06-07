@@ -51,6 +51,34 @@ class DockerRunTaskTest extends Specification {
     task.getArgs() == ['run', '-d', '-p', '8080:8080', '--name=testProject', 'testProject']
   }
 
+  def "should invoke run with extra args when defined in extension"() {
+    given:
+    rootProject.docker.runExtraArgs = ['-v', '--rm=false']
+    DockerRunTask task = getMockedTask()
+    when:
+    task.exec()
+    then:
+    task.getArgs() == ['run', '-d', '-v', '--rm=false', '--name=testProject', 'testProject']
+  }
+
+  def "should should link microservices defined in extension"() {
+    given:
+    createDummyGradleProject('test/one')
+    createDummyGradleProject('test-two')
+    rootProject.docker.linkedMicroservices = ['test/one', 'test-two']
+    DockerRunTask task = getMockedTask()
+    when:
+    task.exec()
+    then:
+    task.getArgs() == ['run', '-d', '--link=test-one:test-one', '--link=test-two:test-two', '--name=testProject', 'testProject']
+  }
+
+  Project createDummyGradleProject(String projectName) {
+    def project = ProjectBuilder.builder().withName(projectName).withParent(rootProject).build()
+    new DockerPlugin().apply(project)
+    project
+  }
+
   DockerRunTask getMockedTask() {
     DockerRunTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
     task.executable 'echo'

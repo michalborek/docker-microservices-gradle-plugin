@@ -25,13 +25,6 @@ abstract class AbstractDockerTask extends Exec {
     return imageName ?: project.name.replaceAll('/', '-')
   }
 
-  protected List<String> getLinkedMicroservices() {
-    return project.extensions.docker.linkedMicroservices.collect {
-      def linkName = it.replaceAll('/', '-')
-      "--link=$linkName:$linkName"
-    }
-  }
-
   protected String getPortMapping() {
     def port = project.extensions.docker.port
     return "$port:$port"
