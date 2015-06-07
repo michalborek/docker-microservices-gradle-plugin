@@ -1,13 +1,10 @@
 package pl.greenpath.gradle
 
-import org.gradle.api.tasks.TaskAction
-
 class DockerInteractiveLogTask extends AbstractDockerTask {
 
-  @TaskAction
-  protected void exec() {
+  @Override
+  protected void prepareExecution() {
     println 'Starting logging: ' + getContainerName()
     super.args 'logs', '-f', getContainerName()
-    super.exec()
   }
 }

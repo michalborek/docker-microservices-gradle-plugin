@@ -1,35 +1,19 @@
 package pl.greenpath.gradle
 
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import spock.lang.Specification
-
-class DockerInteractiveLogTaskTest extends Specification {
+class DockerInteractiveLogTaskTest extends AbstractDockerTaskTest {
 
   static final String TASK_NAME = 'dockerLogs'
-  Project rootProject
 
-  def setup() {
-    rootProject = ProjectBuilder.builder().withName('testProject').build()
-  }
-
-  def "should have set 'docker' as a default executable of the task"() {
-    given:
-    new DockerPlugin().apply(rootProject)
-    when:
-    DockerInteractiveLogTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
-    then:
-    task.getExecutable() == 'docker'
+  String getTaskName() {
+    return TASK_NAME
   }
 
   def "should run interactive docker logs for given project"() {
     given:
-    new DockerPlugin().apply(rootProject)
-    DockerInteractiveLogTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
-    task.executable 'echo'
+    AbstractDockerTask logsTask = getMockedTask()
     when:
-    task.exec()
+    logsTask.exec()
     then:
-    task.getArgs() == ['logs', '-f', 'testProject']
+    logsTask.getArgs() == ['logs', '-f', 'testProject']
   }
 }

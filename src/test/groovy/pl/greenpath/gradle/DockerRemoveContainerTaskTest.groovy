@@ -1,29 +1,18 @@
 package pl.greenpath.gradle
 
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import spock.lang.Specification
+class DockerRemoveContainerTaskTest extends AbstractDockerTaskTest {
 
-class DockerRemoveContainerTaskTest extends Specification {
+  static final String TASK_NAME = 'dockerRemoveContainer'
 
-  Project rootProject
 
-  def setup() {
-    rootProject = ProjectBuilder.builder().withName('testProject').build()
-    new DockerPlugin().apply(rootProject)
-  }
-
-  def "should have set 'docker' as a default executable of the task"() {
-    when:
-    DockerRemoveContainerTask removeContainerTask = rootProject.getTasksByName('dockerRemoveContainer', false)[0]
-    then:
-    removeContainerTask.getExecutable() == 'docker'
+  @Override
+  String getTaskName() {
+    return TASK_NAME
   }
 
   def "should run 'rm' on docker's container"() {
     given:
-    DockerRemoveContainerTask removeContainerTask = rootProject.getTasksByName('dockerRemoveContainer', false)[0]
-    removeContainerTask.executable 'echo'
+    AbstractDockerTask removeContainerTask = getMockedTask()
     when:
     removeContainerTask.exec()
     then:

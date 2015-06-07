@@ -1,18 +1,28 @@
 package pl.greenpath.gradle
 
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.TaskAction
 
 abstract class AbstractDockerTask extends Exec {
 
   public static final String GROUP_NAME = 'docker'
 
   protected AbstractDockerTask() {
-    this('docker')
+    setGroup(GROUP_NAME)
   }
 
-  protected AbstractDockerTask(String functionToExec) {
-    executable functionToExec
-    setGroup(GROUP_NAME)
+  protected abstract void prepareExecution()
+
+  @TaskAction
+  protected final void exec() {
+    prepareExecution()
+    setExecutable(getExecutable());
+    super.exec()
+  }
+
+  @Override
+  String getExecutable() {
+    return project.extensions.docker.executable
   }
 
   protected String getContainerName() {
