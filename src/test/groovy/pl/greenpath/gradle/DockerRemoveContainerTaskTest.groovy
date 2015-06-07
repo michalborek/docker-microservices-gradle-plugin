@@ -10,11 +10,10 @@ class DockerRemoveContainerTaskTest extends Specification {
 
   def setup() {
     rootProject = ProjectBuilder.builder().withName('testProject').build()
+    new DockerPlugin().apply(rootProject)
   }
 
   def "should have set 'docker' as a default executable of the task"() {
-    given:
-    new DockerPlugin().apply(rootProject)
     when:
     DockerRemoveContainerTask removeContainerTask = rootProject.getTasksByName('dockerRemoveContainer', false)[0]
     then:
@@ -23,7 +22,6 @@ class DockerRemoveContainerTaskTest extends Specification {
 
   def "should run 'rm' on docker's container"() {
     given:
-    new DockerPlugin().apply(rootProject)
     DockerRemoveContainerTask removeContainerTask = rootProject.getTasksByName('dockerRemoveContainer', false)[0]
     removeContainerTask.executable 'echo'
     when:

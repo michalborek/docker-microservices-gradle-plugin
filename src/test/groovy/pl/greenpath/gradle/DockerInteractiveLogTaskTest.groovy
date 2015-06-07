@@ -6,6 +6,7 @@ import spock.lang.Specification
 
 class DockerInteractiveLogTaskTest extends Specification {
 
+  static final String TASK_NAME = 'dockerLogs'
   Project rootProject
 
   def setup() {
@@ -16,7 +17,7 @@ class DockerInteractiveLogTaskTest extends Specification {
     given:
     new DockerPlugin().apply(rootProject)
     when:
-    DockerInteractiveLogTask task = rootProject.getTasksByName('dockerLogs', false)[0]
+    DockerInteractiveLogTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
     then:
     task.getExecutable() == 'docker'
   }
@@ -24,7 +25,7 @@ class DockerInteractiveLogTaskTest extends Specification {
   def "should run interactive docker logs for given project"() {
     given:
     new DockerPlugin().apply(rootProject)
-    DockerInteractiveLogTask task = rootProject.getTasksByName('dockerLogs', false)[0]
+    DockerInteractiveLogTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
     task.executable 'echo'
     when:
     task.exec()

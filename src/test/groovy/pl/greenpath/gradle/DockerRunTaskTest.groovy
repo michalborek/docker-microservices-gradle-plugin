@@ -6,6 +6,7 @@ import spock.lang.Specification
 
 class DockerRunTaskTest extends Specification {
 
+  static final String TASK_NAME = 'dockerRun'
   Project rootProject
 
   def setup() {
@@ -16,7 +17,7 @@ class DockerRunTaskTest extends Specification {
 
   def "should have set 'docker' as a default executable of the task"() {
     when:
-    DockerRunTask task = rootProject.getTasksByName('dockerRun', false)[0]
+    DockerRunTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
     then:
     task.getExecutable() == 'docker'
   }
@@ -51,7 +52,7 @@ class DockerRunTaskTest extends Specification {
   }
 
   DockerRunTask getMockedTask() {
-    DockerRunTask task = rootProject.getTasksByName('dockerRun', false)[0]
+    DockerRunTask task = rootProject.getTasksByName(TASK_NAME, false)[0]
     task.executable 'echo'
   }
 }
