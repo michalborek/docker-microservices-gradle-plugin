@@ -6,7 +6,7 @@ class DockerRunTask extends AbstractDockerTask {
   protected void prepareExecution() {
     super.args(['run'] + (project.extensions.docker.runDetached ? ['-d'] : []) +
         (project.extensions.docker.port > 0 ? ['-p', getPortMapping()] : []) + getLinkedMicroservices() + project.extensions.docker.runExtraArgs +
-        ['--name=' + getContainerName(), getContainerName()])
+        ['--name=' + getContainerName(), getImageName()])
     println 'Running container: ' + getContainerName() + ' args: ' + super.getArgs()
   }
 

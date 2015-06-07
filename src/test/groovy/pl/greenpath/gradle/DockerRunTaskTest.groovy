@@ -21,10 +21,31 @@ class DockerRunTaskTest extends AbstractDockerTaskTest {
     task.getArgs() == ['run', '-d', '--name=testProject', 'testProject']
   }
 
+
+  def "should invoke run on docker custom container name when defined in extension"() {
+    given:
+    AbstractDockerTask task = getMockedTask()
+    rootProject.docker.containerName 'custom'
+    when:
+    task.exec()
+    then:
+    task.getArgs() == ['run', '-d', '--name=custom', 'testProject']
+  }
+
+  def "should invoke run on docker custom image name when defined in extension"() {
+    given:
+    AbstractDockerTask task = getMockedTask()
+    rootProject.docker.imageName 'custom'
+    when:
+    task.exec()
+    then:
+    task.getArgs() == ['run', '-d', '--name=testProject', 'custom']
+  }
+
   def "should invoke run without detached mode when defined in extension"() {
     given:
     AbstractDockerTask task = getMockedTask()
-    rootProject.docker.runDetached = false
+    rootProject.docker.runDetached false
     when:
     task.exec()
     then:
@@ -33,7 +54,7 @@ class DockerRunTaskTest extends AbstractDockerTaskTest {
 
   def "should invoke run on docker with given port"() {
     given:
-    rootProject.docker.port = 8080
+    rootProject.docker.port 8080
     AbstractDockerTask task = getMockedTask()
     when:
     task.exec()
@@ -43,7 +64,7 @@ class DockerRunTaskTest extends AbstractDockerTaskTest {
 
   def "should invoke run with extra args when defined in extension"() {
     given:
-    rootProject.docker.runExtraArgs = ['-v', '--rm=false']
+    rootProject.docker.runExtraArgs '-v', '--rm=false'
     AbstractDockerTask task = getMockedTask()
     when:
     task.exec()
@@ -55,7 +76,7 @@ class DockerRunTaskTest extends AbstractDockerTaskTest {
     given:
     createDummyGradleProject('test/one')
     createDummyGradleProject('test-two')
-    rootProject.docker.linkedMicroservices = ['test/one', 'test-two']
+    rootProject.docker.linkedMicroservices 'test/one', 'test-two'
     AbstractDockerTask task = getMockedTask()
     when:
     task.exec()
