@@ -4,6 +4,21 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 
+/**
+ * This plugin is eases usage of docker with microservices.
+ *
+ * <p>Using this plugin it is possible to automatically invoke all tasks starting from
+ * creating an image, a container and finishing with running it.</p>
+ *
+ * <p>It is also possible to restart a service and during that operation previous containers
+ * and images are removed.</p>
+ *
+ * <p>When one microservice is dependent on another, the latter one is always run first.</p>
+ *
+ * <p><b>Note:</b> By now there is a need to have a "docker" directory with Dockerfile in it.
+ * This file is copied along with a jar generated in "libs" directory into 'build/docker' directory.
+ * All operations on docker are invoked on that directory.</p>
+ */
 class DockerPlugin implements Plugin<Project> {
 
   @Override
