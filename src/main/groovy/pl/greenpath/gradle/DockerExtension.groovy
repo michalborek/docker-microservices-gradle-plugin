@@ -7,6 +7,7 @@ class DockerExtension {
   String imageName
   List<String> linkedMicroservices = []
   int port
+  boolean removeVolumes = true
   boolean runDetached = true
   List<String> runExtraArgs = []
 
@@ -62,6 +63,16 @@ class DockerExtension {
    */
   void port(int port) {
     this.port = port
+  }
+
+  /**
+   * Defines whether volumes should be deleted when container is removed.
+   *
+   * This option is turned on by default.
+   * @param removeVolumes
+   */
+  void removeVolumes(boolean removeVolumes) {
+    this.removeVolumes = removeVolumes
   }
 
   void runDetached(boolean detached) {

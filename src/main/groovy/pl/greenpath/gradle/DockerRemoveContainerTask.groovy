@@ -8,7 +8,7 @@ class DockerRemoveContainerTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    super.args 'rm', getContainerName()
+    super.args (['rm'] + (project.extensions.docker.removeVolumes ? ['-v'] : []) + [getContainerName()])
     println 'Removing container: ' + getContainerName()
   }
 }

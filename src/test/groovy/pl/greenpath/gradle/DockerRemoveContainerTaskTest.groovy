@@ -16,6 +16,16 @@ class DockerRemoveContainerTaskTest extends AbstractDockerTaskTest {
     when:
     removeContainerTask.exec()
     then:
+    removeContainerTask.getArgs() == ['rm', '-v', 'testProject']
+  }
+
+  def "should not delete volumes if removeVolumes option turned off"() {
+    given:
+    AbstractDockerTask removeContainerTask = getMockedTask()
+    rootProject.docker.removeVolumes false
+    when:
+    removeContainerTask.exec()
+    then:
     removeContainerTask.getArgs() == ['rm', 'testProject']
   }
 }
