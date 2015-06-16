@@ -25,7 +25,8 @@ class DockerPlugin implements Plugin<Project> {
   void apply(Project project) {
     project.extensions.create("docker", DockerExtension)
 
-    project.task('copyDockerfile', type: Copy, dependsOn: 'assemble') {
+    project.task('generateDockerfile', type: GenerateDockerfileTask)
+    project.task('copyDockerfile', type: Copy, dependsOn: ['assemble', 'generateDockerfile']) {
       from('docker')
       from(new File(project.buildDir, 'libs')) {
         include "${project.name}-${project.version}.jar"

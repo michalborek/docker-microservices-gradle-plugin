@@ -22,7 +22,7 @@ class DockerPluginTest extends Specification {
     expect:
     rootProject.getTasksByName(taskName, false) != null
     where:
-    taskName << ['copyDockerfile', 'dockerStop', 'dockerLogs', 'dockerRun', 'dockerRunSingle', 'dockerRemoveContainer', 'dockerRemoveImage', 'dockerBuild']
+    taskName << ['generateDockerfile', 'copyDockerfile', 'dockerStop', 'dockerLogs', 'dockerRun', 'dockerRunSingle', 'dockerRemoveContainer', 'dockerRemoveImage', 'dockerBuild']
   }
 
   def "dockerRun should be dependant on project's dockerRun given in linkedMicroservices attribute"() {

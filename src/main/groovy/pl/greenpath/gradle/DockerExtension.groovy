@@ -2,6 +2,7 @@ package pl.greenpath.gradle
 
 class DockerExtension {
 
+  String baseImage = 'ubuntu:14.04'
   String containerName
   String executable = 'docker'
   String imageName
@@ -10,6 +11,11 @@ class DockerExtension {
   boolean removeVolumes = true
   boolean runDetached = true
   List<String> runExtraArgs = []
+
+
+  void baseImage(String baseImage) {
+    this.baseImage = baseImage
+  }
 
   /**
    * Defines a name wich will be bound to created container during dockerRun task execution.
