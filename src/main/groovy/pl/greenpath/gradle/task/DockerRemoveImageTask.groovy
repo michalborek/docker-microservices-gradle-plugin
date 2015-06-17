@@ -1,4 +1,4 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerRemoveImageTask extends AbstractDockerTask {
 
@@ -8,7 +8,7 @@ class DockerRemoveImageTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    super.args('rmi', getImageName())
+    args('rmi', getImageName())
     println 'Removing image: ' + getImageName()
   }
 }

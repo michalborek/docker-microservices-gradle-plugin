@@ -1,10 +1,10 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerBuildTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
     println 'Building image: ' + getImageName()
-    super.args 'build', '-t', getImageName(), new File(project.buildDir, 'docker')
+    args 'build', '-t', getImageName(), new File(project.buildDir, 'docker')
   }
 }

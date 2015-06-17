@@ -3,6 +3,15 @@ package pl.greenpath.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import pl.greenpath.gradle.extension.DockerExtension
+import pl.greenpath.gradle.extension.DockerfileExtension
+import pl.greenpath.gradle.task.DockerBuildTask
+import pl.greenpath.gradle.task.DockerInteractiveLogTask
+import pl.greenpath.gradle.task.DockerRemoveContainerTask
+import pl.greenpath.gradle.task.DockerRemoveImageTask
+import pl.greenpath.gradle.task.DockerRunTask
+import pl.greenpath.gradle.task.DockerStopTask
+import pl.greenpath.gradle.task.GenerateDockerfileTask
 
 /**
  * This plugin is eases usage of docker with microservices.
@@ -23,7 +32,7 @@ class DockerPlugin implements Plugin<Project> {
 
   @Override
   void apply(Project project) {
-    project.extensions.create("docker", DockerExtension)
+    attachExtensions(project)
 
     project.task('generateDockerfile', type: GenerateDockerfileTask)
     project.task('copyDockerfile', type: Copy, dependsOn: ['assemble', 'generateDockerfile']) {
@@ -44,6 +53,11 @@ class DockerPlugin implements Plugin<Project> {
     project.afterEvaluate {
       configureDependantTasks(project)
     }
+  }
+
+  private void attachExtensions(Project project) {
+    project.extensions.create("docker", DockerExtension)
+    project.extensions.create("dockerfile", DockerfileExtension)
   }
 
   private void configureDependantTasks(Project project) {

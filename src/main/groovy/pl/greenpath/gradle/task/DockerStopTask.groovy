@@ -1,4 +1,4 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerStopTask extends AbstractDockerTask {
 
@@ -9,6 +9,6 @@ class DockerStopTask extends AbstractDockerTask {
   @Override
   protected void prepareExecution() {
     println 'Stopping container: ' + getContainerName()
-    super.args 'stop', '--time=2', getContainerName()
+    args 'stop', '--time=2', getContainerName()
   }
 }

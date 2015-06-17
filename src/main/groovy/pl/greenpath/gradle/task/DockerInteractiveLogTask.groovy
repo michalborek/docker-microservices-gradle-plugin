@@ -1,4 +1,4 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerInteractiveLogTask extends AbstractDockerTask {
 

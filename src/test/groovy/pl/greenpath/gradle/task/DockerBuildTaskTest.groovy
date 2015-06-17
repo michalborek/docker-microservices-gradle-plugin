@@ -1,6 +1,7 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 import org.gradle.testfixtures.ProjectBuilder
+import pl.greenpath.gradle.DockerPlugin
 
 class DockerBuildTaskTest extends AbstractDockerTaskTest {
 

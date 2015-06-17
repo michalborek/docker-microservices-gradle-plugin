@@ -1,4 +1,4 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerRemoveContainerTask extends AbstractDockerTask {
 
@@ -8,7 +8,7 @@ class DockerRemoveContainerTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    super.args (['rm'] + (project.extensions.docker.removeVolumes ? ['-v'] : []) + [getContainerName()])
+    args(['rm'] + (project.extensions.docker.removeVolumes ? ['-v'] : []) + [getContainerName()])
     println 'Removing container: ' + getContainerName()
   }
 }

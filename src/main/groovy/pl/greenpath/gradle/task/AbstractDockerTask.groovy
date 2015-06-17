@@ -1,4 +1,4 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskAction

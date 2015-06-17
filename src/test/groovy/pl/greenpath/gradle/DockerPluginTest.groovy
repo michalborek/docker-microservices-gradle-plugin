@@ -3,6 +3,8 @@ package pl.greenpath.gradle
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
+import pl.greenpath.gradle.extension.DockerExtension
+import pl.greenpath.gradle.extension.DockerfileExtension
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -40,13 +42,17 @@ class DockerPluginTest extends Specification {
     dependsOnDockerRunOf link2Project
   }
 
-  def "should attach 'docker' extension to project"() {
+  @Unroll
+  def "project should have #extensionName extension bound to #extensionClass"() {
     given:
     def plugin = new DockerPlugin()
-    when:
     plugin.apply(rootProject)
-    then:
-    rootProject.docker instanceof DockerExtension
+    expect:
+    extensionClass.isInstance(rootProject[extensionName])
+    where:
+    extensionName | extensionClass
+    'docker'      | DockerExtension
+    'dockerfile'  | DockerfileExtension
 
   }
 
