@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import pl.greenpath.gradle.extension.DockerExtension
-import pl.greenpath.gradle.extension.DockerfileExtension
+import pl.greenpath.gradle.extension.DockerfileGenerator
 import pl.greenpath.gradle.task.DockerBuildTask
 import pl.greenpath.gradle.task.DockerInteractiveLogTask
 import pl.greenpath.gradle.task.DockerRemoveContainerTask
@@ -16,7 +16,7 @@ import pl.greenpath.gradle.task.GenerateDockerfileTask
 /**
  * This plugin is eases usage of docker with microservices.
  *
- * <p>Using this plugin it is possible to automatically invoke all tasks starting from
+ * <p>Using this plugin it is possible to automatically invoke all tasks starting fromParameter
  * creating an image, a container and finishing with running it.</p>
  *
  * <p>It is also possible to restart a service and during that operation previous containers
@@ -29,6 +29,9 @@ import pl.greenpath.gradle.task.GenerateDockerfileTask
  * All operations on docker are invoked on that directory.</p>
  */
 class DockerPlugin implements Plugin<Project> {
+
+
+  public static final String DOCKERFILE = 'dockerfile'
 
   @Override
   void apply(Project project) {
@@ -55,19 +58,27 @@ class DockerPlugin implements Plugin<Project> {
     }
   }
 
-  private void attachExtensions(Project project) {
-    project.extensions.create("docker", DockerExtension)
-    project.extensions.create("dockerfile", DockerfileExtension)
-  }
 
-  private void configureDependantTasks(Project project) {
+  protected void configureDependantTasks(Project project) {
     project.getTasksByName('dockerRun', false).each {
-      it.dependsOn project.extensions.docker.linkedMicroservices.collect {
+      it.dependsOn project.extensions['docker']['linkedMicroservices'].collect {
         project.getRootProject().findProject(it).getTasksByName('dockerRun', false)
       }
     }
   }
 
+  private void attachExtensions(Project project) {
+    project.extensions.create('docker', DockerExtension)
+    project.extensions.create(DOCKERFILE, DockerfileGenerator)
+  }
+
+  private DockerfileGenerator getDockerfileExtension(Project project) {
+    project.extensions['dockerfile'].asType(DockerfileGenerator)
+  }
+
+  private DockerExtension getDockerExtension(Project project) {
+    project.extensions['docker'].asType(DockerExtension)
+  }
 
 }
 

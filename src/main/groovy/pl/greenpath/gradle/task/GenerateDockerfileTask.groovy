@@ -2,23 +2,24 @@ package pl.greenpath.gradle.task
 
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.tasks.TaskAction
-
-import static java.lang.String.format
+import pl.greenpath.gradle.extension.DockerfileGenerator
 
 class GenerateDockerfileTask extends AbstractTask {
 
+  Closure<DockerfileGenerator> templateClosure
 
   @TaskAction
   def executeTask() {
     def dockerDirectory = new File(getProject().getBuildDir(), 'docker')
     dockerDirectory.mkdirs()
     def dockerfile = new File(dockerDirectory, 'Dockerfile')
+    def dockerfileExtension = new DockerfileGenerator()
+    Closure<DockerfileGenerator> template = templateClosure.asType(Closure).rehydrate(dockerfileExtension, this, this)
+    template()
+    dockerfile << dockerfileExtension.toDockerfile()
+  }
 
-    def dockerExtension = getProject().extensions.docker
-    def appJarName = format('%s-%s.jar', getProject().getName(), getProject().getVersion())
-    dockerfile << format('FROM %s%n', (String) dockerExtension.baseImage)
-    dockerfile << format('EXPOSE %d%n', (int) dockerExtension.port)
-    dockerfile << format('ADD %s%n', appJarName)
-    dockerfile << format('CMD java -jar %s%n', appJarName)
+  void template(Closure<DockerfileGenerator> template) {
+    this.templateClosure = template;
   }
 }
