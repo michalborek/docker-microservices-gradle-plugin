@@ -1,6 +1,8 @@
 package pl.greenpath.gradle.extension
 
-class DockerfileGenerator {
+import org.gradle.api.Project
+
+class DockerfileDeclaration {
 
   List<String> copyCommands = []
   List<String> envCommands = []
@@ -12,6 +14,20 @@ class DockerfileGenerator {
   private String volumeCommand
   private String userCommand
   private String cmdCommand
+  private Project project
+
+  DockerfileDeclaration(Project project) {
+    this.project = project
+  }
+
+  static Closure<DockerfileDeclaration> microserviceTemplate = {
+    def jarFile = "${project.name}-${project.version}.jar"
+    from "ubuntu:14.04"
+    expose project.extensions['docker']['port']
+    add jarFile, '.'
+    cmd "java -jar $jarFile"
+
+  }
 
   void from(String from) {
     fromCommand = "FROM $from"
@@ -49,35 +65,29 @@ class DockerfileGenerator {
     cmdCommand = "CMD $command"
   }
 
-  private List<String> getAsList(String command) {
-    command != null ? [command] : []
-  }
-
-  public String toDockerfile(DockerfileGenerator generator) {
+  String toDockerfile() {
     StringBuilder.newInstance().with {
-      append printIfPresent(owner.fromCommand, generator.&from)
-      append printIfPresent(owner.exposeCommand, generator.&expose)
-      append printIfPresent(owner.workDirCommand, generator.&workdir)
-      append printListIfPresent(owner.envCommands, generator.&env)
-      append printListIfPresent(owner.addCommands, generator.&add)
-      append printListIfPresent(owner.copyCommands, generator.&copy)
-      append printIfPresent(owner.volumeCommand, generator.&volume)
-      append printIfPresent(owner.userCommand, generator.&user)
-      append printIfPresent(owner.cmdCommand, generator.&cmd)
+      append printIfPresent(fromCommand)
+      append printIfPresent(exposeCommand)
+      append printIfPresent(workDirCommand)
+      append printListIfPresent(envCommands)
+      append printListIfPresent(addCommands)
+      append printListIfPresent(copyCommands)
+      append printIfPresent(volumeCommand)
+      append printIfPresent(userCommand)
+      append printIfPresent(cmdCommand)
     }
   }
 
-  private void printIfPresent(String command, Closure<String> method) {
-    if (command != null) {
-      method(command)
-    }
-  }
-
-  private void printListIfPresent(List<String> commands, Closure, method) {
-    if (!commands.isEmpty()) {
-      commands.forEach({ method(it) })
-    }
+  private String printIfPresent(String command) {
+    command == null ? '' : command + '\n'
 
   }
+
+  private String printListIfPresent(List<String> commands) {
+    commands.isEmpty() ? '' : commands.join('\n') << '\n'
+
+  }
+
 
 }

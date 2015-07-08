@@ -4,7 +4,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.extension.DockerExtension
-import pl.greenpath.gradle.extension.DockerfileGenerator
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -35,7 +34,7 @@ class DockerPluginTest extends Specification {
     when:
     plugin.apply(rootProject)
     rootProject.docker {
-      linkedMicroservices = ['link1', 'link2']
+      linkedMicroservices 'link1', 'link2'
     }
     then:
     dependsOnDockerRunOf link1Project
@@ -52,8 +51,6 @@ class DockerPluginTest extends Specification {
     where:
     extensionName | extensionClass
     'docker'      | DockerExtension
-    'dockerfile'  | DockerfileGenerator
-
   }
 
   private void dependsOnDockerRunOf(Project project) {

@@ -1,4 +1,5 @@
 package pl.greenpath.gradle.task
+
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.DockerPlugin
@@ -26,7 +27,7 @@ abstract class AbstractDockerTaskTest extends Specification {
   def "it should be able to change executable"() {
     when:
     AbstractDockerTask task = rootProject.getTasksByName(getTaskName(), false)[0]
-    rootProject.docker.executable = 'testExecutable'
+    rootProject.docker.executable 'testExecutable'
     then:
     task.getExecutable() == 'testExecutable'
   }
