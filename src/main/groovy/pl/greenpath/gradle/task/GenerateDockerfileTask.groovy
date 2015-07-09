@@ -11,6 +11,9 @@ class GenerateDockerfileTask extends AbstractTask {
     def dockerDirectory = new File(getProject().getBuildDir(), 'docker')
     dockerDirectory.mkdirs()
     def dockerfile = new File(dockerDirectory, 'Dockerfile')
+    if (dockerfile.exists()) {
+      dockerfile.delete()
+    }
     DockerfileDeclaration declaration = getProject().extensions['docker']['dockerfile']
     dockerfile << declaration.toDockerfile()
   }

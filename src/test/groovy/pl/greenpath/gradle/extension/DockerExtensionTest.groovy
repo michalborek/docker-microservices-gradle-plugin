@@ -22,7 +22,7 @@ class DockerExtensionTest extends Specification {
     DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.port 8080
     when:
-    dockerExtension.dockerfile.with DockerfileDeclaration.microserviceTemplate
+    dockerExtension.dockerfile.template DockerExtension.microserviceTemplate
     then:
     dockerExtension.dockerfile.toDockerfile() == '''|FROM ubuntu:14.04
                                              |EXPOSE 8080

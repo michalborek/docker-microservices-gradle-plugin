@@ -9,37 +9,39 @@ Usage TBD
 To configure the plugin, use the 'docker' extension block:
 
     docker {
-      //port to be published to host (mandatory)
-      port = 8080
+      // port to be published to host (mandatory)
+      port 8080
 
-      //linked microservices, that should be dockerRun'ed and linked together with this one
-      linkedMicroservices = rootProject.getSubprojects().findAll {
+      // linked microservices, that should be dockerRun'ed and linked together with this one
+      linkedMicroservices rootProject.getSubprojects().findAll {
         it.name.startsWith('ms-')
       }.collect {it.name}
 
-      //name of the container (default: project.name with '/' replaced with '-')
-      containerName = 'microservice'
+      // name of the container (default: project.name with '/' replaced with '-')
+      containerName 'microservice'
 
-      //name of the image (default: project.name with '/' replaced with '-')
-      imageName = 'microservice'
+      // name of the image (default: project.name with '/' replaced with '-')
+      imageName 'microservice'
 
-      //extra arguments passed on the command line to docker run
-      runExtraArgs = ['-v', '/host:/inside_docker']
+      // extra arguments passed on the command line to docker run
+      runExtraArgs '-v', '/host:/inside_docker'
 
-      //run the container in background (default: true)
-      runDetached = true
-      
-      // define dockerfile defined manually
-      dockerfile.with {
+      // run the container in background (default: true)
+      runDetached true
+
+      // define dockerfile manually
+      dockerfile {
         from ubuntu:14.04
         expose 8080
         expose 9090
         env 'NAME', 'value'
         ...
-        add "some.jar", "test.jar"
+        add "some.jar", 'test.jar'
         cmd java "java -jar test.jar"
       }
-      
-      // dockerfile based on template
-      dockerfile.template microserviceTemplate
+
+      // define dockerfile based on template (you can mix these two approches)
+      dockerfile {
+        template microserviceTemplate
+      }
     }

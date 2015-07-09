@@ -20,14 +20,6 @@ class DockerfileDeclaration {
     this.project = project
   }
 
-  static Closure<DockerfileDeclaration> microserviceTemplate = {
-    def jarFile = "${project.name}-${project.version}.jar"
-    from "ubuntu:14.04"
-    expose project.extensions['docker']['port']
-    add jarFile, '.'
-    cmd "java -jar $jarFile"
-  }
-
   void template(Closure<DockerfileDeclaration> templateClosure) {
     with templateClosure
   }
@@ -73,7 +65,7 @@ class DockerfileDeclaration {
   String toDockerfile() {
     StringBuilder.newInstance().with {
       append printIfPresent('FROM', baseImageName)
-      append printInlineListIfPresent('EXPOSE', exposedPorts)
+      append printExposeList(exposedPorts)
       append printIfPresent('WORKDIR', workingDir)
       append printListIfPresent('ENV', environmentalVariables)
       append printListIfPresent('ADD', toAdd)
@@ -84,16 +76,16 @@ class DockerfileDeclaration {
     }
   }
 
-  private String printIfPresent(String commandName, String command) {
+  private static String printIfPresent(String commandName, String command) {
     command == null ? '' : "$commandName $command\n"
   }
 
-  private String printListIfPresent(String commandName, List<String> commands) {
+  private static String printListIfPresent(String commandName, List<String> commands) {
     commands.isEmpty() ? '' : commands.collect { "$commandName $it" }.join('\n') << '\n'
   }
 
-  private String printInlineListIfPresent(String commandName, List<String> commands) {
-    commands.isEmpty() ? '' : "$commandName ${commands.join(' ')}" << '\n'
+  private static String printExposeList(List<Integer> commands) {
+    commands.isEmpty() ? '' : "EXPOSE ${commands.join(' ')}" << '\n'
   }
 
 }

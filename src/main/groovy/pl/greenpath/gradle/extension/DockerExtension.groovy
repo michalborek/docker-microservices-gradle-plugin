@@ -135,4 +135,16 @@ class DockerExtension {
   DockerfileDeclaration getDockerfile() {
     return dockerfile
   }
+
+  void dockerfile(Closure<DockerfileDeclaration> closure) {
+    dockerfile.with closure
+  }
+
+  static Closure<DockerfileDeclaration> microserviceTemplate = {
+    def jarFile = "${project.name}-${project.version}.jar"
+    from "ubuntu:14.04"
+    expose project.extensions['docker']['port']
+    add jarFile, '.'
+    cmd "java -jar $jarFile"
+  }
 }

@@ -3,9 +3,8 @@ package pl.greenpath.gradle.task
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.DockerPlugin
+import pl.greenpath.gradle.extension.DockerExtension
 import spock.lang.Specification
-
-import static pl.greenpath.gradle.extension.DockerfileDeclaration.microserviceTemplate
 
 class GenerateDockerfileTaskTest extends Specification {
 
@@ -23,9 +22,9 @@ class GenerateDockerfileTaskTest extends Specification {
     given:
     def tempDir = File.createTempDir()
     rootProject.version = '1.1'
-    rootProject.extensions.docker.port 8082
+    rootProject.extensions['docker'].port 8082
     rootProject.buildDir = tempDir
-    rootProject.extensions.docker.dockerfile.with microserviceTemplate
+    rootProject.extensions.docker.dockerfile.with DockerExtension.microserviceTemplate
     def task = rootProject.getTasksByName(TASK_NAME, false)[0]
     when:
     task.executeTask()
@@ -45,7 +44,7 @@ class GenerateDockerfileTaskTest extends Specification {
     rootProject.version = '1.1'
     rootProject.buildDir = tempDir
     rootProject.extensions.docker.port 8082
-    rootProject.extensions.docker.dockerfile.template microserviceTemplate
+    rootProject.extensions.docker.dockerfile.template DockerExtension.microserviceTemplate
     rootProject.extensions.docker.dockerfile.add('testing', '.')
     def task = rootProject.getTasksByName(TASK_NAME, false)[0]
     when:
@@ -83,6 +82,22 @@ class GenerateDockerfileTaskTest extends Specification {
     rootProject.extensions.docker.port 8080
     def task = rootProject.getTasksByName(TASK_NAME, false)[0]
     when:
+    task.executeTask()
+    then:
+    def dockerfile = new File(tempDir, 'docker/Dockerfile')
+    dockerfile.exists()
+    dockerfile.getText('UTF-8') == '''EXPOSE 8080
+                                     |'''.stripMargin()
+  }
+
+  def "should replace content of file if already exists"() {
+    def tempDir = File.createTempDir()
+    rootProject.version = '1.2'
+    rootProject.buildDir = tempDir
+    rootProject.extensions.docker.port 8080
+    def task = rootProject.getTasksByName(TASK_NAME, false)[0]
+    when:
+    task.executeTask()
     task.executeTask()
     then:
     def dockerfile = new File(tempDir, 'docker/Dockerfile')
