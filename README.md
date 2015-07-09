@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin.svg)](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin) [![Coverage Status](https://coveralls.io/repos/michalborek/docker-microservices-gradle-plugin/badge.svg?branch=master)](https://coveralls.io/r/michalborek/docker-microservices-gradle-plugin?branch=master)
 
+To see how to apply a plugin in your build.gadle [visit plugin page on Gradle Plugins site](https://plugins.gradle.org/plugin/pl.greenpath.gradle.docker.microservices).
+
 This Gradle plugin allows to start many docker containers at once in specified order. Started dockers are linked 
 together so they can communicate directly.
 
@@ -9,6 +11,7 @@ This plugin uses `docker` command (not a REST API). But in future releases it ma
 
 We created it because it was hard for us to start many microservices in development environment when using Spring Boot. 
 This plugin was created for our convenience but we are open to any ideas that would make it useful for others.
+
 
 To configure the plugin, use the `docker` extension block:
 
