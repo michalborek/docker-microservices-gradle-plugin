@@ -100,10 +100,6 @@ class DockerExtension {
     this.runExtraArgs = extraArgs.toList()
   }
 
-  void dockerfile(Closure<DockerfileDeclaration> dockerfileClosure) {
-    dockerfile.with dockerfileClosure
-  }
-
   String getContainerName() {
     return containerName
   }

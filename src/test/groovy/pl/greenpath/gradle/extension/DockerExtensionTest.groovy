@@ -30,4 +30,29 @@ class DockerExtensionTest extends Specification {
                                              |CMD java -jar testProject-1.0-SNAPSHOT.jar
                                              |'''.stripMargin()
   }
+
+  def "should allow exposing many ports"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    when:
+    dockerExtension.dockerfile.expose 8080
+    dockerExtension.dockerfile.expose 9090
+    then:
+    dockerExtension.dockerfile.toDockerfile() == '''EXPOSE 8080 9090
+                                             |'''.stripMargin()
+  }
+
+  def "should not duplicate exposed ports"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    when:
+    dockerExtension.dockerfile.expose 8080
+    dockerExtension.dockerfile.expose 8080
+    then:
+    dockerExtension.dockerfile.toDockerfile() == '''EXPOSE 8080
+                                             |'''.stripMargin()
+  }
+
 }

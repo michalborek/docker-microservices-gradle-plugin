@@ -45,7 +45,7 @@ class GenerateDockerfileTaskTest extends Specification {
     rootProject.version = '1.1'
     rootProject.buildDir = tempDir
     rootProject.extensions.docker.port 8082
-    rootProject.extensions.docker.dockerfile.with microserviceTemplate
+    rootProject.extensions.docker.dockerfile.template microserviceTemplate
     rootProject.extensions.docker.dockerfile.add('testing', '.')
     def task = rootProject.getTasksByName(TASK_NAME, false)[0]
     when:

@@ -4,16 +4,16 @@ import org.gradle.api.Project
 
 class DockerfileDeclaration {
 
-  List<String> copyCommands = []
-  List<String> envCommands = []
-  List<String> addCommands = []
+  private List<String> toCopy = []
+  private List<String> environmentalVariables = []
+  private List<String> toAdd = []
+  private List<Integer> exposedPorts = []
 
-  private String fromCommand
-  private String exposeCommand
-  private String workDirCommand
-  private String volumeCommand
-  private String userCommand
-  private String cmdCommand
+  private String baseImageName
+  private String workingDir
+  private String volume
+  private String userVariable
+  private String command
   private Project project
 
   DockerfileDeclaration(Project project) {
@@ -26,68 +26,74 @@ class DockerfileDeclaration {
     expose project.extensions['docker']['port']
     add jarFile, '.'
     cmd "java -jar $jarFile"
+  }
 
+  void template(Closure<DockerfileDeclaration> templateClosure) {
+    with templateClosure
   }
 
   void from(String from) {
-    fromCommand = "FROM $from"
+    baseImageName = from
   }
 
   void env(String key, String value) {
-    envCommands << "ENV $key $value"
+    environmentalVariables << "$key $value"
   }
 
   void add(String source, String destination) {
-    addCommands << "ADD $source $destination"
+    toAdd << "$source $destination"
   }
 
   void copy(String source, String destination) {
-    copyCommands << "COPY $source $destination"
+    toCopy << "$source $destination"
   }
 
   void workdir(String workingDir) {
-    workDirCommand = "WORKDIR $workingDir"
+    this.workingDir = workingDir
   }
 
   void expose(int port) {
-    exposeCommand = "EXPOSE $port"
+    if (!(port in exposedPorts)) {
+      exposedPorts << port
+    }
   }
 
   void volume(String volumes) {
-    volumeCommand = "VOLUME $volumes"
+    volume = volumes
   }
 
   void user(String user) {
-    userCommand = "USER $user"
+    userVariable = user
   }
 
   void cmd(String command) {
-    cmdCommand = "CMD $command"
+    this.command = command
   }
 
   String toDockerfile() {
     StringBuilder.newInstance().with {
-      append printIfPresent(fromCommand)
-      append printIfPresent(exposeCommand)
-      append printIfPresent(workDirCommand)
-      append printListIfPresent(envCommands)
-      append printListIfPresent(addCommands)
-      append printListIfPresent(copyCommands)
-      append printIfPresent(volumeCommand)
-      append printIfPresent(userCommand)
-      append printIfPresent(cmdCommand)
+      append printIfPresent('FROM', baseImageName)
+      append printInlineListIfPresent('EXPOSE', exposedPorts)
+      append printIfPresent('WORKDIR', workingDir)
+      append printListIfPresent('ENV', environmentalVariables)
+      append printListIfPresent('ADD', toAdd)
+      append printListIfPresent('COPY', toCopy)
+      append printIfPresent('VOLUME', volume)
+      append printIfPresent('USER', userVariable)
+      append printIfPresent('CMD', command)
     }
   }
 
-  private String printIfPresent(String command) {
-    command == null ? '' : command + '\n'
-
+  private String printIfPresent(String commandName, String command) {
+    command == null ? '' : "$commandName $command\n"
   }
 
-  private String printListIfPresent(List<String> commands) {
-    commands.isEmpty() ? '' : commands.join('\n') << '\n'
-
+  private String printListIfPresent(String commandName, List<String> commands) {
+    commands.isEmpty() ? '' : commands.collect { "$commandName $it" }.join('\n') << '\n'
   }
 
+  private String printInlineListIfPresent(String commandName, List<String> commands) {
+    commands.isEmpty() ? '' : "$commandName ${commands.join(' ')}" << '\n'
+  }
 
 }
