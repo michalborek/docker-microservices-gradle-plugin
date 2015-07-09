@@ -3,11 +3,13 @@ package pl.greenpath.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import pl.greenpath.gradle.extension.DockerExtension
+import pl.greenpath.gradle.task.*
 
 /**
  * This plugin is eases usage of docker with microservices.
  *
- * <p>Using this plugin it is possible to automatically invoke all tasks starting from
+ * <p>Using this plugin it is possible to automatically invoke all tasks starting fromParameter
  * creating an image, a container and finishing with running it.</p>
  *
  * <p>It is also possible to restart a service and during that operation previous containers
@@ -21,12 +23,15 @@ import org.gradle.api.tasks.Copy
  */
 class DockerPlugin implements Plugin<Project> {
 
+
+  public static final String DOCKERFILE = 'dockerfile'
+
   @Override
   void apply(Project project) {
-    project.extensions.create("docker", DockerExtension)
+    attachExtensions(project)
 
-    project.task('copyDockerfile', type: Copy, dependsOn: 'assemble') {
-      from('docker')
+    project.task('generateDockerfile', type: GenerateDockerfileTask)
+    project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
       from(new File(project.buildDir, 'libs')) {
         include "${project.name}-${project.version}.jar"
       }
@@ -38,21 +43,29 @@ class DockerPlugin implements Plugin<Project> {
     project.task('dockerRunSingle', type: DockerRunTask, dependsOn: 'dockerBuild')
     project.task('dockerRemoveContainer', type: DockerRemoveContainerTask, dependsOn: 'dockerStop')
     project.task('dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer')
-    project.task('dockerBuild', type: DockerBuildTask, dependsOn: ['dockerRemoveImage',
-                                                                   'copyDockerfile'])
+    project.task('dockerBuild', type: DockerBuildTask, dependsOn:
+        ['dockerRemoveImage', 'generateDockerfile', 'copyJarToDockerDir'])
     project.afterEvaluate {
       configureDependantTasks(project)
     }
   }
 
-  private void configureDependantTasks(Project project) {
+
+  protected void configureDependantTasks(Project project) {
     project.getTasksByName('dockerRun', false).each {
-      it.dependsOn project.extensions.docker.linkedMicroservices.collect {
+      it.dependsOn project.extensions['docker']['linkedMicroservices'].collect {
         project.getRootProject().findProject(it).getTasksByName('dockerRun', false)
       }
     }
   }
 
+  private void attachExtensions(Project project) {
+    project.extensions.create('docker', DockerExtension, project)
+  }
+
+  private DockerExtension getDockerExtension(Project project) {
+    project.extensions['docker'].asType(DockerExtension)
+  }
 
 }
 

@@ -1,15 +1,26 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.extension
+
+import org.gradle.api.Project
 
 class DockerExtension {
 
-  String containerName
-  String executable = 'docker'
-  String imageName
-  List<String> linkedMicroservices = []
-  int port
-  boolean removeVolumes = true
-  boolean runDetached = true
-  List<String> runExtraArgs = []
+  private String containerName
+  private String executable
+  private String imageName
+  private List<String> linkedMicroservices = []
+  private int port
+  private boolean removeVolumes = true
+  private boolean runDetached = true
+  private List<String> runExtraArgs = []
+  private DockerfileDeclaration dockerfile
+
+  private Project project
+
+  DockerExtension(Project project) {
+    this.project = project
+    executable 'docker'
+    dockerfile = new DockerfileDeclaration(project)
+  }
 
   /**
    * Defines a name wich will be bound to created container during dockerRun task execution.
@@ -63,6 +74,7 @@ class DockerExtension {
    */
   void port(int port) {
     this.port = port
+    dockerfile.expose port
   }
 
   /**
@@ -86,5 +98,53 @@ class DockerExtension {
    */
   void runExtraArgs(String... extraArgs) {
     this.runExtraArgs = extraArgs.toList()
+  }
+
+  String getContainerName() {
+    return containerName
+  }
+
+  String getExecutable() {
+    return executable
+  }
+
+  String getImageName() {
+    return imageName
+  }
+
+  List<String> getLinkedMicroservices() {
+    return linkedMicroservices
+  }
+
+  int getPort() {
+    return port
+  }
+
+  boolean getRemoveVolumes() {
+    return removeVolumes
+  }
+
+  boolean getRunDetached() {
+    return runDetached
+  }
+
+  List<String> getRunExtraArgs() {
+    return runExtraArgs
+  }
+
+  DockerfileDeclaration getDockerfile() {
+    return dockerfile
+  }
+
+  void dockerfile(Closure<DockerfileDeclaration> closure) {
+    dockerfile.with closure
+  }
+
+  static Closure<DockerfileDeclaration> microserviceTemplate = {
+    def jarFile = "${project.name}-${project.version}.jar"
+    from "ubuntu:14.04"
+    expose project.extensions['docker']['port']
+    add jarFile, '.'
+    cmd "java -jar $jarFile"
   }
 }

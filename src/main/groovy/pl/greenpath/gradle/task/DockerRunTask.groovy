@@ -1,13 +1,13 @@
-package pl.greenpath.gradle
+package pl.greenpath.gradle.task
 
 class DockerRunTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    super.args(['run'] + (project.extensions.docker.runDetached ? ['-d'] : []) +
+    args(['run'] + (project.extensions.docker.runDetached ? ['-d'] : []) +
         (project.extensions.docker.port > 0 ? ['-p', getPortMapping()] : []) + getLinkedMicroservices() + project.extensions.docker.runExtraArgs +
         ['--name=' + getContainerName(), getImageName()])
-    println 'Running container: ' + getContainerName() + ' args: ' + super.getArgs()
+    println 'Running container: ' + getContainerName() + ' args: ' + getArgs()
   }
 
   private List<String> getLinkedMicroservices() {

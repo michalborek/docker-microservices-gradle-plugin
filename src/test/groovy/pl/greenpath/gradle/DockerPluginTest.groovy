@@ -3,6 +3,7 @@ package pl.greenpath.gradle
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
+import pl.greenpath.gradle.extension.DockerExtension
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -22,7 +23,7 @@ class DockerPluginTest extends Specification {
     expect:
     rootProject.getTasksByName(taskName, false) != null
     where:
-    taskName << ['copyDockerfile', 'dockerStop', 'dockerLogs', 'dockerRun', 'dockerRunSingle', 'dockerRemoveContainer', 'dockerRemoveImage', 'dockerBuild']
+    taskName << ['generateDockerfile', 'copyDockerfile', 'dockerStop', 'dockerLogs', 'dockerRun', 'dockerRunSingle', 'dockerRemoveContainer', 'dockerRemoveImage', 'dockerBuild']
   }
 
   def "dockerRun should be dependant on project's dockerRun given in linkedMicroservices attribute"() {
@@ -33,21 +34,23 @@ class DockerPluginTest extends Specification {
     when:
     plugin.apply(rootProject)
     rootProject.docker {
-      linkedMicroservices = ['link1', 'link2']
+      linkedMicroservices 'link1', 'link2'
     }
     then:
     dependsOnDockerRunOf link1Project
     dependsOnDockerRunOf link2Project
   }
 
-  def "should attach 'docker' extension to project"() {
+  @Unroll
+  def "project should have #extensionName extension bound to #extensionClass"() {
     given:
     def plugin = new DockerPlugin()
-    when:
     plugin.apply(rootProject)
-    then:
-    rootProject.docker instanceof DockerExtension
-
+    expect:
+    extensionClass.isInstance(rootProject[extensionName])
+    where:
+    extensionName | extensionClass
+    'docker'      | DockerExtension
   }
 
   private void dependsOnDockerRunOf(Project project) {
