@@ -31,8 +31,7 @@ class DockerPlugin implements Plugin<Project> {
     attachExtensions(project)
 
     project.task('generateDockerfile', type: GenerateDockerfileTask)
-    project.task('copyDockerfile', type: Copy, dependsOn: ['assemble', 'generateDockerfile']) {
-      from('docker')
+    project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
       from(new File(project.buildDir, 'libs')) {
         include "${project.name}-${project.version}.jar"
       }
@@ -44,8 +43,8 @@ class DockerPlugin implements Plugin<Project> {
     project.task('dockerRunSingle', type: DockerRunTask, dependsOn: 'dockerBuild')
     project.task('dockerRemoveContainer', type: DockerRemoveContainerTask, dependsOn: 'dockerStop')
     project.task('dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer')
-    project.task('dockerBuild', type: DockerBuildTask, dependsOn: ['dockerRemoveImage',
-                                                                   'copyDockerfile'])
+    project.task('dockerBuild', type: DockerBuildTask, dependsOn:
+        ['dockerRemoveImage', 'generateDockerfile', 'copyJarToDockerDir'])
     project.afterEvaluate {
       configureDependantTasks(project)
     }

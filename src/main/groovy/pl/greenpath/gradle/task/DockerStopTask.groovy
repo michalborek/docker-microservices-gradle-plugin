@@ -3,7 +3,7 @@ package pl.greenpath.gradle.task
 class DockerStopTask extends AbstractDockerTask {
 
   public DockerStopTask() {
-    setIgnoreExitValue(true)
+    ignoreExitValue true
   }
 
   @Override
