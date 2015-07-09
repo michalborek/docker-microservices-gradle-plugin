@@ -2,20 +2,22 @@
 
 [![Build Status](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin.svg)](https://travis-ci.org/michalborek/docker-microservices-gradle-plugin) [![Coverage Status](https://coveralls.io/repos/michalborek/docker-microservices-gradle-plugin/badge.svg?branch=master)](https://coveralls.io/r/michalborek/docker-microservices-gradle-plugin?branch=master)
 
-This is a first draft of gradle plugin that allows to start many docker containers at once in specified order.
+This Gradle plugin allows to start many docker containers at once in specified order. Started dockers are linked 
+together so they can communicate directly.
 
-Usage TBD
+This plugin uses `docker` command (not a REST API). But in future releases it may change.
 
-To configure the plugin, use the 'docker' extension block:
+We created it because it was hard for us to start many microservices in development environment when using Spring Boot. 
+This plugin was created for our convenience but we are open to any ideas that would make it useful for others.
+
+To configure the plugin, use the `docker` extension block:
 
     docker {
       // port to be published to host (mandatory)
       port 8080
 
       // linked microservices, that should be dockerRun'ed and linked together with this one
-      linkedMicroservices rootProject.getSubprojects().findAll {
-        it.name.startsWith('ms-')
-      }.collect {it.name}
+      linkedMicroservices 'auth', 'orders', 'accounts'
 
       // name of the container (default: project.name with '/' replaced with '-')
       containerName 'microservice'
@@ -35,7 +37,10 @@ To configure the plugin, use the 'docker' extension block:
         expose 8080
         expose 9090
         env 'NAME', 'value'
-        ...
+        copy 'source', 'destination'
+        workdir '/path/to/workdir'
+        volume  '/var/volume'
+        user 'deamon'
         add "some.jar", 'test.jar'
         cmd java "java -jar test.jar"
       }
@@ -45,3 +50,23 @@ To configure the plugin, use the 'docker' extension block:
         template microserviceTemplate
       }
     }
+
+The microserviceTemplate shown above generates dockerfile that works well with default 
+Spring Boot configuration, that is:
+
+    FROM ubuntu:14.04
+    EXPOSE port # by default docker.port attribute
+    ADD jarFile '.'
+    CMD java -jar $jarFile
+
+where `jarFile` is a name generated as `projectName.projectVersion.jar`.
+
+**Hint:** If you want to be dependant on all other projects (e.g. you have a web UI microservice that 
+is dependent on any other. as `linkedMicroservices` value you can set:
+
+    rootProject.getSubprojects().findAll { it.name != project.name }.collect {it.name}
+
+**Note:** In current plugin implementation you need to copy this jar to `build/docker/` but we have it on to do list.
+
+
+Feel free to post feature requests and bugs using GitHub.

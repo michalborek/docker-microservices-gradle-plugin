@@ -47,28 +47,35 @@ class DockerfileDeclarationTest extends Specification {
 
   def "should add WORKDIR with parameters"() {
     when:
-    dockerfileDeclaration.workdir('/home/user')
+    dockerfileDeclaration.workdir '/home/user'
     then:
     dockerfileDeclaration.toDockerfile() == 'WORKDIR /home/user\n'
   }
 
   def "should add EXPOSE with given port"() {
     when:
-    dockerfileDeclaration.expose(8080)
+    dockerfileDeclaration.expose 8080
     then:
     dockerfileDeclaration.toDockerfile() == 'EXPOSE 8080\n'
   }
 
+  def "should add EXPOSE with given ports"() {
+    when:
+    dockerfileDeclaration.expose 8080, 9090
+    then:
+    dockerfileDeclaration.toDockerfile() == 'EXPOSE 8080 9090\n'
+  }
+
   def "should add VOLUME with defined volume"() {
     when:
-    dockerfileDeclaration.volume('/var/volume')
+    dockerfileDeclaration.volume '/var/volume'
     then:
     dockerfileDeclaration.toDockerfile() == 'VOLUME /var/volume\n'
   }
 
   def "should add USER with defined user"() {
     when:
-    dockerfileDeclaration.user('deamon')
+    dockerfileDeclaration.user 'deamon'
     then:
     dockerfileDeclaration.toDockerfile() == 'USER deamon\n'
   }

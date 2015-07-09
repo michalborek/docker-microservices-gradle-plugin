@@ -50,6 +50,10 @@ class DockerfileDeclaration {
     }
   }
 
+  void expose(int ... ports) {
+    ports.each { expose it }
+  }
+
   void volume(String volumes) {
     volume = volumes
   }
