@@ -28,4 +28,18 @@ To configure the plugin, use the 'docker' extension block:
 
       //run the container in background (default: true)
       runDetached = true
+      
+      // define dockerfile defined manually
+      dockerfile.with {
+        from ubuntu:14.04
+        expose 8080
+        expose 9090
+        env 'NAME', 'value'
+        ...
+        add "some.jar", "test.jar"
+        cmd java "java -jar test.jar"
+      }
+      
+      // dockerfile based on template
+      dockerfile.template microserviceTemplate
     }
