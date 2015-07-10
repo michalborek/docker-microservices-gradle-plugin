@@ -63,10 +63,6 @@ class DockerPlugin implements Plugin<Project> {
     project.extensions.create('docker', DockerExtension, project)
   }
 
-  private DockerExtension getDockerExtension(Project project) {
-    project.extensions['docker'].asType(DockerExtension)
-  }
-
 }
 
 
