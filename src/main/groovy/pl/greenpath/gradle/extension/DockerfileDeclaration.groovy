@@ -8,6 +8,7 @@ class DockerfileDeclaration {
   private List<String> environmentalVariables = []
   private List<String> toAdd = []
   private List<Integer> exposedPorts = []
+  private List<String> runCommands = []
 
   private String baseImageName
   private String workingDir
@@ -66,6 +67,10 @@ class DockerfileDeclaration {
     this.command = command
   }
 
+  void run(String command) {
+    this.runCommands << command
+  }
+
   String toDockerfile() {
     StringBuilder.newInstance().with {
       append printIfPresent('FROM', baseImageName)
@@ -74,6 +79,7 @@ class DockerfileDeclaration {
       append printListIfPresent('ENV', environmentalVariables)
       append printListIfPresent('ADD', toAdd)
       append printListIfPresent('COPY', toCopy)
+      append printListIfPresent('RUN', runCommands)
       append printIfPresent('VOLUME', volume)
       append printIfPresent('USER', userVariable)
       append printIfPresent('CMD', command)

@@ -59,6 +59,16 @@ class DockerfileDeclarationTest extends Specification {
     dockerfileDeclaration.toDockerfile() == 'EXPOSE 8080\n'
   }
 
+  def "should add RUN with given commands"() {
+    when:
+    dockerfileDeclaration.run('localedef -i en_US')
+    dockerfileDeclaration.run('echo "ok"')
+    then:
+    dockerfileDeclaration.toDockerfile() == '''RUN localedef -i en_US
+                                              |RUN echo "ok"
+                                              |'''.stripMargin()
+  }
+
   def "should add EXPOSE with given ports"() {
     when:
     dockerfileDeclaration.expose 8080, 9090
