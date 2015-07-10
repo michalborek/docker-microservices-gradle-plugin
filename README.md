@@ -47,10 +47,15 @@ To configure the plugin, use the `docker` extension block:
         add "some.jar", 'test.jar'
         cmd java "java -jar test.jar"
       }
+      
+      // use microservice template
+      dockerfile microserviceTemplate
 
-      // define dockerfile based on template (you can mix these two approches)
+      // or you can mix these two approches
       dockerfile {
         template microserviceTemplate
+        env 'name', 'value'
+        ...
       }
     }
 
