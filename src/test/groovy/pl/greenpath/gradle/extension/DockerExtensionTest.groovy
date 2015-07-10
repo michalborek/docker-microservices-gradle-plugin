@@ -5,6 +5,8 @@ import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.DockerPlugin
 import spock.lang.Specification
 
+import static pl.greenpath.gradle.extension.DockerExtension.microserviceTemplate
+
 class DockerExtensionTest extends Specification {
 
   Project project
@@ -22,7 +24,22 @@ class DockerExtensionTest extends Specification {
     DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.port 8080
     when:
-    dockerExtension.dockerfile.template DockerExtension.microserviceTemplate
+    dockerExtension.dockerfile.template microserviceTemplate
+    then:
+    dockerExtension.dockerfile.toDockerfile() == '''|FROM java:8
+                                             |EXPOSE 8080
+                                             |ADD testProject-1.0-SNAPSHOT.jar .
+                                             |CMD java -jar testProject-1.0-SNAPSHOT.jar
+                                             |'''.stripMargin()
+  }
+
+  def "should apply closure directly to dockerfile attribute in docker extension"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    dockerExtension.port 8080
+    when:
+    dockerExtension.dockerfile microserviceTemplate
     then:
     dockerExtension.dockerfile.toDockerfile() == '''|FROM java:8
                                              |EXPOSE 8080
