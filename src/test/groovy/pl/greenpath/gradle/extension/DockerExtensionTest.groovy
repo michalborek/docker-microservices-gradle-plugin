@@ -24,7 +24,7 @@ class DockerExtensionTest extends Specification {
     when:
     dockerExtension.dockerfile.template DockerExtension.microserviceTemplate
     then:
-    dockerExtension.dockerfile.toDockerfile() == '''|FROM ubuntu:14.04
+    dockerExtension.dockerfile.toDockerfile() == '''|FROM java:8
                                              |EXPOSE 8080
                                              |ADD testProject-1.0-SNAPSHOT.jar .
                                              |CMD java -jar testProject-1.0-SNAPSHOT.jar

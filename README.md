@@ -57,7 +57,7 @@ To configure the plugin, use the `docker` extension block:
 The microserviceTemplate shown above generates dockerfile that works well with default 
 Spring Boot configuration, that is:
 
-    FROM ubuntu:14.04
+    FROM java:8
     EXPOSE port # by default docker.port attribute
     ADD jarFile '.'
     CMD java -jar $jarFile

@@ -31,7 +31,7 @@ class GenerateDockerfileTaskTest extends Specification {
     then:
     def dockerfile = new File(tempDir, 'docker/Dockerfile')
     dockerfile.exists()
-    dockerfile.getText('UTF-8') == '''FROM ubuntu:14.04
+    dockerfile.getText('UTF-8') == '''FROM java:8
                                      |EXPOSE 8082
                                      |ADD testProject-1.1.jar .
                                      |CMD java -jar testProject-1.1.jar
@@ -52,7 +52,7 @@ class GenerateDockerfileTaskTest extends Specification {
     then:
     def dockerfile = new File(tempDir, 'docker/Dockerfile')
     dockerfile.exists()
-    dockerfile.getText('UTF-8') == '''FROM ubuntu:14.04
+    dockerfile.getText('UTF-8') == '''FROM java:8
                                      |EXPOSE 8082
                                      |ADD testProject-1.1.jar .
                                      |ADD testing .

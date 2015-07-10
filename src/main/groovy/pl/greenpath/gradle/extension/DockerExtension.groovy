@@ -142,7 +142,7 @@ class DockerExtension {
 
   static Closure<DockerfileDeclaration> microserviceTemplate = {
     def jarFile = "${project.name}-${project.version}.jar"
-    from "ubuntu:14.04"
+    from 'java:8'
     expose project.extensions['docker']['port']
     add jarFile, '.'
     cmd "java -jar $jarFile"
