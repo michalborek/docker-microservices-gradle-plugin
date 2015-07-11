@@ -94,8 +94,8 @@ class DockerfileDeclaration {
     commands.isEmpty() ? '' : commands.collect { "$commandName $it" }.join('\n') << '\n'
   }
 
-  private static String printExposeList(List<Integer> commands) {
-    commands.isEmpty() ? '' : "EXPOSE ${commands.join(' ')}" << '\n'
+  private static String printExposeList(List<Integer> ports) {
+    ports.isEmpty() ? '' : "EXPOSE ${ports.join(' ')}" << '\n'
   }
 
 }
