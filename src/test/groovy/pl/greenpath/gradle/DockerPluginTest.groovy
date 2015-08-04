@@ -12,7 +12,9 @@ class DockerPluginTest extends Specification {
   Project rootProject
 
   def setup() {
+    def buildDir = File.createTempDir()
     rootProject = ProjectBuilder.builder().withName('testProject').build()
+    rootProject.setBuildDir(buildDir)
   }
 
   @Unroll
@@ -40,6 +42,27 @@ class DockerPluginTest extends Specification {
     dependsOnDockerRunOf link1Project
     dependsOnDockerRunOf link2Project
   }
+
+  def "copyToDockerDir should copy files defined in docker extensions into docker directory"() {
+    given:
+    File fileToCopy = getTempFile()
+    File anotherFileToCopy = getTempFile()
+    def plugin = new DockerPlugin()
+    plugin.apply(rootProject)
+    rootProject.extensions.docker.copyToDockerDir fileToCopy, anotherFileToCopy
+    when:
+    rootProject.getTasksByName('copyToDockerDir', false)[0].copy()
+    then:
+    new File(rootProject.getBuildDir(), "docker/${fileToCopy.name}").exists()
+    new File(rootProject.getBuildDir(), "docker/${anotherFileToCopy.name}").exists()
+  }
+
+  private File getTempFile() {
+    def anotherFileToCopy = File.createTempFile('testfile' + Math.random() * 100 % 100, '.jar')
+    anotherFileToCopy.deleteOnExit()
+    anotherFileToCopy
+  }
+
 
   @Unroll
   def "project should have #extensionName extension bound to #extensionClass"() {

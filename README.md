@@ -33,6 +33,9 @@ To configure the plugin, use the `docker` extension block:
 
       // run the container in background (default: true)
       runDetached true
+      
+      // when set to false dockerfile won't be generated (default: true)
+      generateDockerfile false
 
       // define dockerfile manually
       dockerfile {

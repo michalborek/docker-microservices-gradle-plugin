@@ -11,8 +11,10 @@ class DockerExtension {
   private int port
   private boolean removeVolumes = true
   private boolean runDetached = true
+  private List<File> copyToDockerDir = []
   private List<String> runExtraArgs = []
   private DockerfileDeclaration dockerfile
+  private boolean generateDockerfile = true
 
   private Project project
 
@@ -92,6 +94,18 @@ class DockerExtension {
   }
 
   /**
+   * Defines file
+   * @param files
+   */
+  void copyToDockerDir(File... files) {
+    files.each { copyToDockerDir << it }
+  }
+
+  void generateDockerfile(boolean generate) {
+    this.generateDockerfile = generate
+  }
+
+  /**
    * Defines extra arguments that are attached to default ones on 'docker run'
    * command execution.
    * @param extraArgs
@@ -112,6 +126,10 @@ class DockerExtension {
     return imageName
   }
 
+  boolean shouldGenerateDockerfile() {
+    return generateDockerfile
+  }
+
   List<String> getLinkedMicroservices() {
     return linkedMicroservices
   }
@@ -130,6 +148,10 @@ class DockerExtension {
 
   List<String> getRunExtraArgs() {
     return runExtraArgs
+  }
+
+  List<File> getCopyToDockerDir() {
+    return copyToDockerDir
   }
 
   DockerfileDeclaration getDockerfile() {

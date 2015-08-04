@@ -1,11 +1,8 @@
 package pl.greenpath.gradle
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
 import pl.greenpath.gradle.extension.DockerExtension
 import pl.greenpath.gradle.task.*
-
 /**
  * This plugin is eases usage of docker with microservices.
  *
@@ -23,33 +20,26 @@ import pl.greenpath.gradle.task.*
  */
 class DockerPlugin implements Plugin<Project> {
 
-
   public static final String DOCKERFILE = 'dockerfile'
 
   @Override
   void apply(Project project) {
-    attachExtensions(project)
+    attachExtensions project
 
     project.task('generateDockerfile', type: GenerateDockerfileTask)
-    project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
-      from(new File(project.buildDir, 'libs')) {
-        include "${project.name}-${project.version}.jar"
-      }
-      into new File(project.buildDir, 'docker')
-    }
-    project.task('dockerStop', type: DockerStopTask)
-    project.task('dockerLogs', type: DockerInteractiveLogTask)
-    project.task('dockerRun', type: DockerRunTask, dependsOn: 'dockerBuild')
-    project.task('dockerRunSingle', type: DockerRunTask, dependsOn: 'dockerBuild')
-    project.task('dockerRemoveContainer', type: DockerRemoveContainerTask, dependsOn: 'dockerStop')
-    project.task('dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer')
-    project.task('dockerBuild', type: DockerBuildTask, dependsOn:
-        ['dockerRemoveImage', 'generateDockerfile', 'copyJarToDockerDir'])
+    project.task 'copyToDockerDir', type: CopyToDockerDirTask, dependsOn: 'assemble'
+    project.task 'dockerStop', type: DockerStopTask
+    project.task 'dockerLogs', type: DockerInteractiveLogTask
+    project.task 'dockerRun', type: DockerRunTask, dependsOn: 'dockerBuild'
+    project.task 'dockerRunSingle', type: DockerRunTask, dependsOn: 'dockerBuild'
+    project.task 'dockerRemoveContainer', type: DockerRemoveContainerTask, dependsOn: 'dockerStop'
+    project.task 'dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer'
+    project.task 'dockerBuild', type: DockerBuildTask, dependsOn:
+        ['dockerRemoveImage', 'generateDockerfile', 'copyToDockerDir']
     project.afterEvaluate {
-      configureDependantTasks(project)
+      configureDependantTasks project
     }
   }
-
 
   protected void configureDependantTasks(Project project) {
     project.getTasksByName('dockerRun', false).each {
@@ -62,7 +52,6 @@ class DockerPlugin implements Plugin<Project> {
   private void attachExtensions(Project project) {
     project.extensions.create('docker', DockerExtension, project)
   }
-
 }
 
 

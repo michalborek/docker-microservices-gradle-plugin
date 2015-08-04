@@ -15,6 +15,10 @@ class GenerateDockerfileTask extends AbstractTask {
 
   @TaskAction
   def executeTask() {
+    if (!getProject().extensions['docker'].shouldGenerateDockerfile()) {
+      println 'Dockerfile generation disabled.'
+      return
+    }
     File dockerfile = getDockerfile()
     if (dockerfile.exists()) {
       dockerfile.delete()

@@ -106,4 +106,22 @@ class GenerateDockerfileTaskTest extends Specification {
                                      |'''.stripMargin()
   }
 
+  def "should skip dockerfile generation when generateDockerfile is set to false"() {
+    given:
+    def tempDir = File.createTempDir()
+    rootProject.version = '1.1'
+    rootProject.buildDir = tempDir
+    rootProject.extensions.docker.port 8082
+    rootProject.extensions.docker.dockerfile.template DockerExtension.microserviceTemplate
+    rootProject.extensions.docker.dockerfile.add('testing', '.')
+    rootProject.extensions.docker.generateDockerfile false
+    def task = rootProject.getTasksByName(TASK_NAME, false)[0]
+    when:
+    task.executeTask()
+    then:
+    def dockerfile = new File(tempDir, 'docker/Dockerfile')
+    !dockerfile.exists()
+  }
+
+
 }
