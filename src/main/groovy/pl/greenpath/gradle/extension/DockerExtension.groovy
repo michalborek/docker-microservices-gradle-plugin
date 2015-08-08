@@ -162,6 +162,11 @@ class DockerExtension {
     dockerfile.with closure
   }
 
+  void dockerfile(String dockerfile) {
+    this.dockerfile.stringBasedDockerfile(dockerfile)
+  }
+
+
   static Closure<DockerfileDeclaration> microserviceTemplate = {
     def jarFile = "${project.name}-${project.version}.jar"
     from 'java:8'

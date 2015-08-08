@@ -16,6 +16,7 @@ class DockerfileDeclaration {
   private String userVariable
   private String command
   private Project project
+  private String stringBasedDockerfile
 
   DockerfileDeclaration(Project project) {
     this.project = project
@@ -71,8 +72,12 @@ class DockerfileDeclaration {
     this.runCommands << command
   }
 
+  void stringBasedDockerfile(String dockerfile) {
+    this.stringBasedDockerfile = dockerfile.readLines().collect({ it.trim() }).join('\n')
+  }
+
   String toDockerfile() {
-    StringBuilder.newInstance().with {
+    stringBasedDockerfile ?: StringBuilder.newInstance().with {
       append printIfPresent('FROM', baseImageName)
       append printExposeList(exposedPorts)
       append printIfPresent('WORKDIR', workingDir)

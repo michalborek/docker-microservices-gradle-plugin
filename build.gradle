@@ -58,11 +58,6 @@ pluginBundle {
   }
 }
 
-// Add the classpath file to the test runtime classpath
-dependencies {
-
-}
-
 jacocoTestReport {
   reports {
     xml.enabled = true // coveralls plugin depends on xml format report

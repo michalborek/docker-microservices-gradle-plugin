@@ -124,4 +124,24 @@ class GenerateDockerfileTaskTest extends Specification {
   }
 
 
+  def "should generate Dockerfile based on string representation passed as 'dockerfile' argument "() {
+    given:
+    def tempDir = File.createTempDir()
+    rootProject.version = '1.1'
+    rootProject.extensions['docker'].port 8082
+    rootProject.buildDir = tempDir
+    rootProject.extensions.docker.dockerfile """FROM java:8
+                                                EXPOSE 9091
+                                                CMD echo 'ok'
+    """
+    when:
+    rootProject.getTasksByName(TASK_NAME, false)*.executeTask()
+    then:
+    def dockerfile = new File(tempDir, 'docker/Dockerfile')
+    dockerfile.exists()
+    dockerfile.getText('UTF-8') == '''FROM java:8
+                                     |EXPOSE 9091
+                                     |CMD echo 'ok'
+                                     |'''.stripMargin()
+  }
 }

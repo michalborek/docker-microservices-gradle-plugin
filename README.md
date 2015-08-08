@@ -37,7 +37,8 @@ To configure the plugin, use the `docker` extension block:
       // when set to false dockerfile won't be generated (default: true)
       generateDockerfile false
 
-      // define dockerfile manually
+      // define dockerfile manually. The drawback of this solution is that order of execution 
+      // of these commands is not preserved.
       dockerfile {
         from ubuntu:14.04
         expose 8080
@@ -47,7 +48,7 @@ To configure the plugin, use the `docker` extension block:
         workdir '/path/to/workdir'
         volume  '/var/volume'
         user 'deamon'
-        add "some.jar", 'test.jar'
+        add 'some.jar', 'test.jar'
         cmd java "java -jar test.jar"
       }
       
@@ -60,7 +61,20 @@ To configure the plugin, use the `docker` extension block:
         env 'name', 'value'
         ...
       }
+      
+      // instead of defining such a custom generation you can also define string based Dockerfile
+      // The advantage of this solution compared to copying pure Dockerfile is that you can define 
+      // own parameters.
+      dockerfile """
+         FROM java:8
+         EXPOSE 9012
+         CMD java -jar ${project.file}-${project.version}.jar
+      """
+      
     }
+**Notice:** You should not mix closure/template based dockerfile declaration with string based.
+In such a case the string definition will always be taken.
+
 
 The microserviceTemplate shown above generates dockerfile that works well with default 
 Spring Boot configuration, that is:
