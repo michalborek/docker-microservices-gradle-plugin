@@ -43,21 +43,7 @@ class DockerPluginTest extends Specification {
     dependsOnDockerRunOf link2Project
   }
 
-  def "copyToDockerDir should copy files defined in docker extensions into docker directory"() {
-    given:
-    File fileToCopy = getTempFile()
-    File anotherFileToCopy = getTempFile()
-    def plugin = new DockerPlugin()
-    plugin.apply(rootProject)
-    rootProject.extensions.docker.copyToDockerDir fileToCopy, anotherFileToCopy
-    when:
-    rootProject.getTasksByName('copyToDockerDir', false)[0].copy()
-    then:
-    new File(rootProject.getBuildDir(), "docker/${fileToCopy.name}").exists()
-    new File(rootProject.getBuildDir(), "docker/${anotherFileToCopy.name}").exists()
-  }
-
-  private File getTempFile() {
+  private static File getTempFile() {
     def anotherFileToCopy = File.createTempFile('testfile' + Math.random() * 100 % 100, '.jar')
     anotherFileToCopy.deleteOnExit()
     anotherFileToCopy

@@ -11,7 +11,6 @@ class DockerExtension {
   private int port
   private boolean removeVolumes = true
   private boolean runDetached = true
-  private List<File> copyToDockerDir = []
   private List<String> runExtraArgs = []
   private DockerfileDeclaration dockerfile
   private boolean generateDockerfile = true
@@ -93,14 +92,6 @@ class DockerExtension {
     this.runDetached = detached
   }
 
-  /**
-   * Defines file
-   * @param files
-   */
-  void copyToDockerDir(File... files) {
-    files.each { copyToDockerDir << it }
-  }
-
   void generateDockerfile(boolean generate) {
     this.generateDockerfile = generate
   }
@@ -148,10 +139,6 @@ class DockerExtension {
 
   List<String> getRunExtraArgs() {
     return runExtraArgs
-  }
-
-  List<File> getCopyToDockerDir() {
-    return copyToDockerDir
   }
 
   DockerfileDeclaration getDockerfile() {
