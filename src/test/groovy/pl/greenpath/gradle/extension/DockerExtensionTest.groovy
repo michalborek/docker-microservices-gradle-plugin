@@ -85,4 +85,20 @@ class DockerExtensionTest extends Specification {
     dockerExtension.runExtraArgs.equals([arg1, arg2])
   }
 
+  def "should publish specified ports"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+
+    def hostPort1 = 123
+    def containerPort1 = 456
+    def hostPort2 = 22
+    def containerPort2 = 33
+    when:
+    dockerExtension.publishPort(hostPort1, containerPort1)
+    dockerExtension.publishPort(hostPort2, containerPort2)
+    then:
+    dockerExtension.runExtraArgs.equals(['-p', "${hostPort1}:${containerPort1}",
+                                         '-p', "${hostPort2}:${containerPort2}"])
+  }
 }

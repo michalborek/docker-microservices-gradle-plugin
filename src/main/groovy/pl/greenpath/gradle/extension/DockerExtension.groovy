@@ -78,6 +78,10 @@ class DockerExtension {
     dockerfile.expose port
   }
 
+  void publishPort(int hostPort, int containerPort) {
+    addDockerRunArgs('-p', "${hostPort}:${containerPort}")
+  }
+
   /**
    * Defines whether volumes should be deleted when container is removed.
    *
