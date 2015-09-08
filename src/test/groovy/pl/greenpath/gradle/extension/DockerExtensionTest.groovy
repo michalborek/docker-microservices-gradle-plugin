@@ -72,4 +72,17 @@ class DockerExtensionTest extends Specification {
                                              |'''.stripMargin()
   }
 
+  def "should append the docker run args to the old ones"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    String arg1 = 'arg1'
+    String arg2 = 'arg2'
+    when:
+    dockerExtension.addDockerRunArgs(arg1)
+    dockerExtension.addDockerRunArgs(arg2)
+    then:
+    dockerExtension.runExtraArgs.equals([arg1, arg2])
+  }
+
 }

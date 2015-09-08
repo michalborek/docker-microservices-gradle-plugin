@@ -105,6 +105,10 @@ class DockerExtension {
     this.runExtraArgs = extraArgs.toList()
   }
 
+  void addDockerRunArgs(String... additionalArgs) {
+    this.runExtraArgs.addAll(additionalArgs)
+  }
+
   String getContainerName() {
     return containerName
   }
