@@ -13,11 +13,25 @@ class DockerExtensionTest extends Specification {
 
   Project childProject
 
+  DockerExtension dockerExtension
+
   def setup() {
+    setupProjects()
+
+    applyPluginToProjects()
+
+    dockerExtension = project.extensions['docker']
+  }
+
+  def setupProjects() {
     project = ProjectBuilder.builder().withName('testProject').build()
+    project.version = '1.0-SNAPSHOT'
     childProject = ProjectBuilder.builder().withName('childProject')
-                                           .withParent(project)
-                                           .build()
+        .withParent(project)
+        .build()
+  }
+
+  def applyPluginToProjects() {
     def plugin = new DockerPlugin()
     plugin.apply(project)
     plugin.apply(childProject)
@@ -25,8 +39,6 @@ class DockerExtensionTest extends Specification {
 
   def "should apply microserviceTemplate"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.port 8080
     when:
     dockerExtension.dockerfile.template microserviceTemplate
@@ -40,8 +52,6 @@ class DockerExtensionTest extends Specification {
 
   def "should apply closure directly to dockerfile attribute in docker extension"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.port 8080
     when:
     dockerExtension.dockerfile microserviceTemplate
@@ -54,9 +64,6 @@ class DockerExtensionTest extends Specification {
   }
 
   def "should allow exposing many ports"() {
-    given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     when:
     dockerExtension.dockerfile.expose 8080
     dockerExtension.dockerfile.expose 9090
@@ -66,9 +73,6 @@ class DockerExtensionTest extends Specification {
   }
 
   def "should not duplicate exposed ports"() {
-    given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     when:
     dockerExtension.dockerfile.expose 8080
     dockerExtension.dockerfile.expose 8080
@@ -79,8 +83,6 @@ class DockerExtensionTest extends Specification {
 
   def "should append the docker run args to the old ones"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     String arg1 = 'arg1'
     String arg2 = 'arg2'
     when:
@@ -92,9 +94,6 @@ class DockerExtensionTest extends Specification {
 
   def "should publish specified ports"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
-
     def hostPort1 = 123
     def containerPort1 = 456
     def hostPort2 = 22
@@ -108,18 +107,12 @@ class DockerExtensionTest extends Specification {
   }
 
   def "should have default root project path on docker host equal to /project"() {
-    given:
-    project.version = '1.0-SNAPSHOT'
-    when:
-    DockerExtension dockerExtension = project.extensions['docker']
-    then:
+    expect:
     dockerExtension.fixedRootProjectPath == '/project'
   }
 
   def "should allow to customize the root project path on docker host"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     String somePath = '/my_fav_path'
     when:
     dockerExtension.fixedRootProjectPath somePath
@@ -128,9 +121,6 @@ class DockerExtensionTest extends Specification {
   }
 
   def "should bind mount specified path from the docker host to the container"() {
-    given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = project.extensions['docker']
     when:
     dockerExtension.bindMount('/src', '/dst')
     then:
@@ -144,9 +134,7 @@ class DockerExtensionTest extends Specification {
 
   def "should replace %rootProjectDir% marker if mapProjectPathsToFixedRoot is enabled"() {
     given:
-    project.version = '1.0-SNAPSHOT'
     String rootProjectPath = '/proj'
-    DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.mapProjectPathsToFixedRoot true
     dockerExtension.fixedRootProjectPath rootProjectPath
     when:
@@ -157,9 +145,7 @@ class DockerExtensionTest extends Specification {
 
   def "should replace %projectDir% marker for rootProject if mapProjectPathsToFixedRoot is enabled"() {
     given:
-    project.version = '1.0-SNAPSHOT'
     String rootProjectPath = '/proj'
-    DockerExtension dockerExtension = project.extensions['docker']
     dockerExtension.mapProjectPathsToFixedRoot true
     dockerExtension.fixedRootProjectPath rootProjectPath
     when:
@@ -170,9 +156,8 @@ class DockerExtensionTest extends Specification {
 
   def "should replace %projectDir% marker for child project if mapProjectPathsToFixedRoot is enabled"() {
     given:
-    project.version = '1.0-SNAPSHOT'
     String rootProjectPath = '/proj'
-    DockerExtension dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions['docker']
     dockerExtension.mapProjectPathsToFixedRoot true
     dockerExtension.fixedRootProjectPath rootProjectPath
     when:
@@ -183,8 +168,7 @@ class DockerExtensionTest extends Specification {
 
   def "should replace %projectDir% marker with real projectDir for child project"() {
     given:
-    project.version = '1.0-SNAPSHOT'
-    DockerExtension dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions['docker']
     dockerExtension.mapProjectPathsToFixedRoot false
     when:
     dockerExtension.bindMount('%projectDir%/some/path', '/dst')
