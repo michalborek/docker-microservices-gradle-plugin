@@ -1,9 +1,9 @@
 package pl.greenpath.gradle.extension
-
 import org.gradle.api.Project
 
 class DockerExtension {
 
+  private String fixedRootProjectPath = '/project'
   private String containerName
   private String executable
   private String imageName
@@ -14,13 +14,17 @@ class DockerExtension {
   private List<String> runExtraArgs = []
   private DockerfileDeclaration dockerfile
   private boolean generateDockerfile = true
-
+  private boolean mapProjectPathsToFixedRoot = false
   private Project project
 
   DockerExtension(Project project) {
     this.project = project
     executable 'docker'
     dockerfile = new DockerfileDeclaration(project)
+  }
+
+  void fixedRootProjectPath(String path) {
+    fixedRootProjectPath = path
   }
 
   /**
@@ -82,6 +86,56 @@ class DockerExtension {
     addDockerRunArgs('-p', "${hostPort}:${containerPort}")
   }
 
+  String getProjectDirPathOnDockerHost() {
+    URI rootProjectDirURI = project.rootProject.projectDir.toURI()
+    URI projectDirURI = project.projectDir.toURI()
+    String relativeProjectDirPath = rootProjectDirURI.relativize(projectDirURI)
+
+    if (relativeProjectDirPath.isEmpty())
+      return fixedRootProjectPath
+
+    fixedRootProjectPath + '/' + relativeProjectDirPath
+  }
+
+  String replaceMarkerWithProjectPathMappedToFixedRoot(String pathWithMarker) {
+    String rootProjectDirMarker = '%rootProjectDir%'
+    String projectDirMarker = '%projectDir%'
+
+    if (pathWithMarker.contains(rootProjectDirMarker)) {
+      return pathWithMarker.replaceFirst(rootProjectDirMarker, fixedRootProjectPath)
+    }
+    else if (pathWithMarker.contains(projectDirMarker)) {
+      return pathWithMarker.replaceFirst(projectDirMarker, getProjectDirPathOnDockerHost())
+    }
+
+    pathWithMarker
+  }
+
+  String replaceMarkerWithRealPath(String pathWithMarker) {
+    String rootProjectDirMarker = '%rootProjectDir%'
+    String projectDirMarker = '%projectDir%'
+
+    if (pathWithMarker.contains(rootProjectDirMarker)) {
+      return pathWithMarker.replaceFirst(rootProjectDirMarker, project.rootProject.projectDir.toString())
+    }
+    else if (pathWithMarker.contains(projectDirMarker)) {
+      return pathWithMarker.replaceFirst(projectDirMarker, project.projectDir.toString())
+    }
+
+    pathWithMarker
+  }
+
+  void bindMount(String srcPath, String dstPath) {
+    def srcPathWithoutMarker
+    if (mapProjectPathsToFixedRoot) {
+      srcPathWithoutMarker = replaceMarkerWithProjectPathMappedToFixedRoot(srcPath)
+    }
+    else {
+      srcPathWithoutMarker = replaceMarkerWithRealPath(srcPath)
+    }
+    addDockerRunArgs('-v', "${srcPathWithoutMarker}:${dstPath}")
+  }
+
   /**
    * Defines whether volumes should be deleted when container is removed.
    *
@@ -100,6 +154,10 @@ class DockerExtension {
     this.generateDockerfile = generate
   }
 
+  void mapProjectPathsToFixedRoot(boolean shouldMap) {
+    this.mapProjectPathsToFixedRoot = shouldMap
+  }
+
   /**
    * Defines extra arguments that are attached to default ones on 'docker run'
    * command execution.
@@ -111,6 +169,10 @@ class DockerExtension {
 
   void addDockerRunArgs(String... additionalArgs) {
     this.runExtraArgs.addAll(additionalArgs)
+  }
+
+  String getFixedRootProjectPath() {
+    return fixedRootProjectPath
   }
 
   String getContainerName() {
@@ -151,6 +213,10 @@ class DockerExtension {
 
   DockerfileDeclaration getDockerfile() {
     return dockerfile
+  }
+
+  boolean getMapProjectPathsToFixedRoot() {
+    return mapProjectPathsToFixedRoot
   }
 
   void dockerfile(Closure<DockerfileDeclaration> closure) {

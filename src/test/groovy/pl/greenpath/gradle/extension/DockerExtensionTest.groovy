@@ -11,12 +11,17 @@ class DockerExtensionTest extends Specification {
 
   Project project
 
+  Project childProject
+
   def setup() {
     project = ProjectBuilder.builder().withName('testProject').build()
+    childProject = ProjectBuilder.builder().withName('childProject')
+                                           .withParent(project)
+                                           .build()
     def plugin = new DockerPlugin()
     plugin.apply(project)
+    plugin.apply(childProject)
   }
-
 
   def "should apply microserviceTemplate"() {
     given:
@@ -82,7 +87,7 @@ class DockerExtensionTest extends Specification {
     dockerExtension.addDockerRunArgs(arg1)
     dockerExtension.addDockerRunArgs(arg2)
     then:
-    dockerExtension.runExtraArgs.equals([arg1, arg2])
+    dockerExtension.runExtraArgs.join(' ').contains("${arg1} ${arg2}")
   }
 
   def "should publish specified ports"() {
@@ -98,7 +103,92 @@ class DockerExtensionTest extends Specification {
     dockerExtension.publishPort(hostPort1, containerPort1)
     dockerExtension.publishPort(hostPort2, containerPort2)
     then:
-    dockerExtension.runExtraArgs.equals(['-p', "${hostPort1}:${containerPort1}",
-                                         '-p', "${hostPort2}:${containerPort2}"])
+    dockerExtension.runExtraArgs.join(' ').contains("-p ${hostPort1}:${containerPort1}")
+    dockerExtension.runExtraArgs.join(' ').contains("-p ${hostPort2}:${containerPort2}")
+  }
+
+  def "should have default root project path on docker host equal to /project"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    when:
+    DockerExtension dockerExtension = project.extensions['docker']
+    then:
+    dockerExtension.fixedRootProjectPath == '/project'
+  }
+
+  def "should allow to customize the root project path on docker host"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    String somePath = '/my_fav_path'
+    when:
+    dockerExtension.fixedRootProjectPath somePath
+    then:
+    dockerExtension.fixedRootProjectPath == somePath
+  }
+
+  def "should bind mount specified path from the docker host to the container"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = project.extensions['docker']
+    when:
+    dockerExtension.bindMount('/src', '/dst')
+    then:
+    dockerExtension.runExtraArgs.join(' ').contains('-v /src:/dst')
+  }
+
+  def "should not map docker host paths by default"() {
+    expect:
+    project.extensions['docker'].mapProjectPathsToFixedRoot == false
+  }
+
+  def "should replace %rootProjectDir% marker if mapProjectPathsToFixedRoot is enabled"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    String rootProjectPath = '/proj'
+    DockerExtension dockerExtension = project.extensions['docker']
+    dockerExtension.mapProjectPathsToFixedRoot true
+    dockerExtension.fixedRootProjectPath rootProjectPath
+    when:
+    dockerExtension.bindMount('%rootProjectDir%/some/path', '/dst')
+    then:
+    dockerExtension.runExtraArgs.join(' ').contains("-v ${rootProjectPath}/some/path:/dst")
+  }
+
+  def "should replace %projectDir% marker for rootProject if mapProjectPathsToFixedRoot is enabled"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    String rootProjectPath = '/proj'
+    DockerExtension dockerExtension = project.extensions['docker']
+    dockerExtension.mapProjectPathsToFixedRoot true
+    dockerExtension.fixedRootProjectPath rootProjectPath
+    when:
+    dockerExtension.bindMount('%projectDir%/some/path', '/dst')
+    then:
+    dockerExtension.runExtraArgs.join(' ').contains("-v ${rootProjectPath}/some/path:/dst")
+  }
+
+  def "should replace %projectDir% marker for child project if mapProjectPathsToFixedRoot is enabled"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    String rootProjectPath = '/proj'
+    DockerExtension dockerExtension = childProject.extensions['docker']
+    dockerExtension.mapProjectPathsToFixedRoot true
+    dockerExtension.fixedRootProjectPath rootProjectPath
+    when:
+    dockerExtension.bindMount('%projectDir%/some/path', '/dst')
+    then:
+    dockerExtension.runExtraArgs.join(' ').contains("-v ${rootProjectPath}/childProject/some/path:/dst")
+  }
+
+  def "should replace %projectDir% marker with real projectDir for child project"() {
+    given:
+    project.version = '1.0-SNAPSHOT'
+    DockerExtension dockerExtension = childProject.extensions['docker']
+    dockerExtension.mapProjectPathsToFixedRoot false
+    when:
+    dockerExtension.bindMount('%projectDir%/some/path', '/dst')
+    then:
+    dockerExtension.runExtraArgs.join(' ').contains("-v ${childProject.projectDir}/some/path:/dst")
   }
 }
