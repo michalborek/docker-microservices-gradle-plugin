@@ -175,4 +175,16 @@ class DockerExtensionTest extends Specification {
     then:
     dockerExtension.runExtraArgs.join(' ').contains("-v ${childProject.projectDir}/some/path:/dst")
   }
+
+  def 'should allow to define run parameters using a closure'() {
+    given:
+    dockerExtension = childProject.extensions['docker']
+    when:
+    dockerExtension.run {
+      extraArgs 'a', 'b'
+      detached true
+    }
+    then:
+    dockerExtension.getRunArguments() == ['-d', 'a', 'b']
+  }
 }

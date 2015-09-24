@@ -1,4 +1,5 @@
 package pl.greenpath.gradle.extension
+
 import org.gradle.api.Project
 
 class DockerExtension {
@@ -16,6 +17,7 @@ class DockerExtension {
   private boolean generateDockerfile = true
   private boolean mapProjectPathsToFixedRoot = false
   private Project project
+  private DockerRunExtension runExtension = new DockerRunExtension()
 
   DockerExtension(Project project) {
     this.project = project
@@ -103,8 +105,7 @@ class DockerExtension {
 
     if (pathWithMarker.contains(rootProjectDirMarker)) {
       return pathWithMarker.replaceFirst(rootProjectDirMarker, fixedRootProjectPath)
-    }
-    else if (pathWithMarker.contains(projectDirMarker)) {
+    } else if (pathWithMarker.contains(projectDirMarker)) {
       return pathWithMarker.replaceFirst(projectDirMarker, getProjectDirPathOnDockerHost())
     }
 
@@ -117,8 +118,7 @@ class DockerExtension {
 
     if (pathWithMarker.contains(rootProjectDirMarker)) {
       return pathWithMarker.replaceFirst(rootProjectDirMarker, project.rootProject.projectDir.toString())
-    }
-    else if (pathWithMarker.contains(projectDirMarker)) {
+    } else if (pathWithMarker.contains(projectDirMarker)) {
       return pathWithMarker.replaceFirst(projectDirMarker, project.projectDir.toString())
     }
 
@@ -129,8 +129,7 @@ class DockerExtension {
     def srcPathWithoutMarker
     if (mapProjectPathsToFixedRoot) {
       srcPathWithoutMarker = replaceMarkerWithProjectPathMappedToFixedRoot(srcPath)
-    }
-    else {
+    } else {
       srcPathWithoutMarker = replaceMarkerWithRealPath(srcPath)
     }
     addDockerRunArgs('-v', "${srcPathWithoutMarker}:${dstPath}")
@@ -164,6 +163,7 @@ class DockerExtension {
    * @param extraArgs
    */
   void runExtraArgs(String... extraArgs) {
+    println('runExtraArgs is deprecated. Instead use run { extraArgs "arg1", "arg2" }')
     this.runExtraArgs = extraArgs.toList()
   }
 
@@ -193,6 +193,10 @@ class DockerExtension {
 
   List<String> getLinkedMicroservices() {
     return linkedMicroservices
+  }
+
+  List<String> getRunArguments() {
+    return runExtension.getArguments();
   }
 
   int getPort() {
@@ -227,6 +231,11 @@ class DockerExtension {
     this.dockerfile.stringBasedDockerfile(dockerfile)
   }
 
+  void run(Closure<DockerRunExtension> runParameters) {
+    runParameters.delegate = runExtension;
+    runParameters.resolveStrategy = Closure.DELEGATE_ONLY
+    runParameters();
+  }
 
   static Closure<DockerfileDeclaration> microserviceTemplate = {
     def jarFile = "${project.name}-${project.version}.jar"
