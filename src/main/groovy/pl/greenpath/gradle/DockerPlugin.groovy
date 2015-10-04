@@ -44,6 +44,7 @@ class DockerPlugin implements Plugin<Project> {
     project.task('dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer')
     project.task('dockerBuild', type: DockerBuildTask, dependsOn:
         ['dockerRemoveImage', 'generateDockerfile', 'copyJarToDockerDir'])
+    project.task('dockerPush', type: DockerPushTask, dependsOn: 'dockerBuild')
     project.afterEvaluate {
       configureDependantTasks project
     }
