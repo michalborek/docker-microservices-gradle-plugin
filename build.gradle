@@ -5,8 +5,9 @@ buildscript {
     }
   }
   dependencies {
+    classpath 'io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE'
     classpath 'com.gradle.publish:plugin-publish-plugin:0.9.1'
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
+    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0x'
   }
 }
 
@@ -14,6 +15,7 @@ apply plugin: 'groovy'
 apply plugin: 'com.gradle.plugin-publish'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'io.spring.dependency-management'
 
 repositories {
   jcenter()
@@ -34,11 +36,17 @@ task createClasspathManifest {
 
 dependencies {
   compile gradleApi()
-  compile localGroovy()
+  compile 'org.codehaus.groovy:groovy-all'
 
   testCompile gradleTestKit()
-  testCompile 'org.spockframework:spock-core:1.0-groovy-2.3'
+  testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
   testRuntime files(createClasspathManifest)
+}
+
+dependencyManagement {
+  dependencies {
+    dependency 'org.codehaus.groovy:groovy-all:2.4.4'
+  }
 }
 
 version = '1.7.1'
@@ -66,5 +74,5 @@ jacocoTestReport {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.7'
+  gradleVersion = '2.8'
 }
