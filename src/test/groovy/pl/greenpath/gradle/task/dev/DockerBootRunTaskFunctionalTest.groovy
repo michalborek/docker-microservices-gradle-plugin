@@ -62,7 +62,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     then:
     result.tasks.first().outcome == TaskOutcome.SUCCESS
     Thread.sleep(1000)
-    Process process = new ProcessBuilder().command('docker', 'inspect', 'testApp').start()
+    Process process = new ProcessBuilder().command('docker', 'ps', '-a').start()
     process.waitFor()
     println process.errorStream.text
     println process.inputStream.text
