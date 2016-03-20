@@ -49,7 +49,7 @@ dependencyManagement {
   }
 }
 
-version = '1.8.0-SNAPSHOT'
+version = '2.0.0'
 group = 'pl.greenpath.gradle.dockermicroservices'
 
 pluginBundle {
@@ -74,5 +74,5 @@ jacocoTestReport {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.8'
+  gradleVersion = '2.12'
 }
