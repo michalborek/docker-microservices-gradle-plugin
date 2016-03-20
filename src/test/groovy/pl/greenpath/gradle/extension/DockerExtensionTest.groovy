@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.DockerPlugin
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static pl.greenpath.gradle.extension.DockerExtension.microserviceTemplate
 
@@ -175,4 +176,34 @@ class DockerExtensionTest extends Specification {
     then:
     dockerExtension.runExtraArgs.join(' ').contains("-v ${childProject.projectDir}/some/path:/dst")
   }
+
+  @Unroll
+  def "should set default value for #param dev extension attribute"() {
+    given:
+    dockerExtension = childProject.extensions['docker']
+    expect:
+    dockerExtension.getDevExtension()[param] == defaultValue
+    where:
+    param                       | defaultValue
+    'containerDependenciesPath' | '/dependencies/'
+    'containerBuildPath'        | '/build/'
+  }
+
+  def "should allow defining own dependency path"() {
+    given:
+    dockerExtension = childProject.extensions['docker']
+    String dummyDependencyDir = '/a/'
+    String dummyBuildDir = '/b/'
+    when:
+    dockerExtension.dev {
+      containerDependenciesDir dummyDependencyDir
+      containerBuildDir dummyBuildDir
+    }
+    then:
+    dockerExtension.getDevExtension().containerDependenciesPath == dummyDependencyDir
+    dockerExtension.getDevExtension().containerBuildPath == dummyBuildDir
+
+
+  }
+
 }

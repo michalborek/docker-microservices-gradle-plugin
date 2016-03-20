@@ -1,4 +1,5 @@
 package pl.greenpath.gradle.extension
+
 import org.gradle.api.Project
 
 class DockerExtension {
@@ -13,6 +14,7 @@ class DockerExtension {
   private boolean runDetached = true
   private List<String> runExtraArgs = []
   private DockerfileDeclaration dockerfile
+  private DevExtension devExtension
   private boolean generateDockerfile = true
   private boolean mapProjectPathsToFixedRoot = false
   private Project project
@@ -21,6 +23,7 @@ class DockerExtension {
     this.project = project
     executable 'docker'
     dockerfile = new DockerfileDeclaration(project)
+    devExtension = new DevExtension()
   }
 
   void fixedRootProjectPath(String path) {
@@ -103,8 +106,7 @@ class DockerExtension {
 
     if (pathWithMarker.contains(rootProjectDirMarker)) {
       return pathWithMarker.replaceFirst(rootProjectDirMarker, fixedRootProjectPath)
-    }
-    else if (pathWithMarker.contains(projectDirMarker)) {
+    } else if (pathWithMarker.contains(projectDirMarker)) {
       return pathWithMarker.replaceFirst(projectDirMarker, getProjectDirPathOnDockerHost())
     }
 
@@ -117,8 +119,7 @@ class DockerExtension {
 
     if (pathWithMarker.contains(rootProjectDirMarker)) {
       return pathWithMarker.replaceFirst(rootProjectDirMarker, project.rootProject.projectDir.toString())
-    }
-    else if (pathWithMarker.contains(projectDirMarker)) {
+    } else if (pathWithMarker.contains(projectDirMarker)) {
       return pathWithMarker.replaceFirst(projectDirMarker, project.projectDir.toString())
     }
 
@@ -129,8 +130,7 @@ class DockerExtension {
     def srcPathWithoutMarker
     if (mapProjectPathsToFixedRoot) {
       srcPathWithoutMarker = replaceMarkerWithProjectPathMappedToFixedRoot(srcPath)
-    }
-    else {
+    } else {
       srcPathWithoutMarker = replaceMarkerWithRealPath(srcPath)
     }
     addDockerRunArgs('-v', "${srcPathWithoutMarker}:${dstPath}")
@@ -221,6 +221,14 @@ class DockerExtension {
 
   void dockerfile(Closure<DockerfileDeclaration> closure) {
     dockerfile.with closure
+  }
+
+  void dev(Closure<DevExtension> closure) {
+    devExtension.with closure
+  }
+
+  DevExtension getDevExtension() {
+    return devExtension
   }
 
   void dockerfile(String dockerfile) {
