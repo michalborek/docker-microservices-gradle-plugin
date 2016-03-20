@@ -16,7 +16,8 @@ class DockerBootRunTask extends DockerRunTask {
   @Override
   protected void prepareExecution() {
     super.prepareExecution()
-    args(['java', '-cp', classpath() + ':' + sourceClassPath(), mainClassName()])
+    String classPath = dependenciesClassPath() + ':' + sourceClassPath() + ':' + resourcesPath()
+    args(['java', '-cp', classPath, mainClassName()])
   }
 
   @Override
@@ -24,13 +25,13 @@ class DockerBootRunTask extends DockerRunTask {
     File gradleHomeDir = project.getGradle().getGradleUserHomeDir()
     return super.runExtraArgs +
         ['-v', gradleHomeDir.absolutePath + ':' + getDevExtension().getContainerDependenciesPath()] +
-        ['-v', project.getBuildDir().absolutePath + ':' + getDevExtension().getContainerBuildPath()]
+        ['-v', project.getRootDir().absolutePath + ':' + getDevExtension().getContainerProjectPath()]
   }
 
-  private String classpath() {
+  private String dependenciesClassPath() {
     String dependenciesPath = getDevExtension().getContainerDependenciesPath()
     URI gradleHomeDir = project.getGradle().getGradleUserHomeDir().toURI()
-    String result = new SourceSetFinder(project).findMainSourceSet().getRuntimeClasspath().filter {
+    String result = new SourceSetFinder(project).findMainSourceSet().runtimeClasspath.filter {
       it.isFile()
     }.collect {
       dependenciesPath + gradleHomeDir.relativize(it.getAbsoluteFile().toURI())
@@ -39,11 +40,19 @@ class DockerBootRunTask extends DockerRunTask {
   }
 
   private String sourceClassPath() {
-    String buildPath = getDevExtension().getContainerBuildPath()
-    String result = new SourceSetFinder(project).findMainSourceSet().getOutput().collect {
-      buildPath + project.getBuildDir().toURI().relativize(it.toURI())
+    String projectPath = getDevExtension().getContainerProjectPath()
+    File classesDir = new SourceSetFinder(project).findMainSourceSet().output.classesDir
+
+    return projectPath + project.getRootDir().toURI().relativize(classesDir.toURI())
+  }
+
+  private String resourcesPath() {
+    String projectPath = getDevExtension().getContainerProjectPath()
+    Set<File> resourcesDirs = new SourceSetFinder(project).findMainSourceSet().getResources().srcDirs
+
+    return resourcesDirs.collect {
+      projectPath + project.getRootDir().toURI().relativize(it.toURI())
     }.join(CLASSPATH_SEPARATOR)
-    return result
   }
 
   private String mainClassName() {

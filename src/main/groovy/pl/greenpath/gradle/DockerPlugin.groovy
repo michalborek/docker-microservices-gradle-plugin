@@ -40,7 +40,7 @@ class DockerPlugin implements Plugin<Project> {
     project.task('dockerStop', type: DockerStopTask)
     project.task('dockerLogs', type: DockerInteractiveLogTask)
     project.task('dockerRun', type: DockerRunTask, dependsOn: 'dockerBuild')
-    project.task('dockerBootRun', type: DockerBootRunTask)
+    project.task('dockerBootRun', type: DockerBootRunTask, dependsOn: ['dockerRemoveContainer', 'assemble'])
     project.task('dockerRunSingle', type: DockerRunTask, dependsOn: 'dockerBuild')
     project.task('dockerRemoveContainer', type: DockerRemoveContainerTask, dependsOn: 'dockerStop')
     project.task('dockerRemoveImage', type: DockerRemoveImageTask, dependsOn: 'dockerRemoveContainer')

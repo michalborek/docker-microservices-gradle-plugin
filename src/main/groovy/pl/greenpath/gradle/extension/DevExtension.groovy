@@ -4,22 +4,22 @@ class DevExtension {
 
   private String containerDependenciesPath = '/dependencies/'
 
-  private String containerBuildPath = '/build/'
+  private String containerProjectPath = '/project/'
 
   void containerDependenciesDir(String containerDependenciesDir) {
     this.containerDependenciesPath = attachTrailingSlash(containerDependenciesDir)
   }
 
-  void containerBuildDir(String containerBuildDir) {
-    this.containerBuildPath = attachTrailingSlash(containerBuildDir)
+  void containerProjectDir(String containerProjectDir) {
+    this.containerProjectPath = attachTrailingSlash(containerProjectDir)
   }
 
   String getContainerDependenciesPath() {
     return containerDependenciesPath
   }
 
-  String getContainerBuildPath() {
-    return containerBuildPath
+  String getContainerProjectPath() {
+    return containerProjectPath
   }
 
   private static String attachTrailingSlash(String value) {

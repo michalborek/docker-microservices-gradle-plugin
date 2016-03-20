@@ -16,6 +16,6 @@ public class SourceSetFinder {
   public SourceSet findMainSourceSet() {
     JavaPluginConvention javaPlugin = project.getConvention().getPlugin(JavaPluginConvention.class)
     SourceSetContainer sourceSets = javaPlugin.getSourceSets()
-    sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)
+    return sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)
   }
 }

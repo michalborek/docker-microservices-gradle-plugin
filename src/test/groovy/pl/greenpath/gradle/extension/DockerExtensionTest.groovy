@@ -186,22 +186,22 @@ class DockerExtensionTest extends Specification {
     where:
     param                       | defaultValue
     'containerDependenciesPath' | '/dependencies/'
-    'containerBuildPath'        | '/build/'
+    'containerProjectPath'      | '/project/'
   }
 
   def "should allow defining own dependency path"() {
     given:
     dockerExtension = childProject.extensions['docker']
     String dummyDependencyDir = '/a/'
-    String dummyBuildDir = '/b/'
+    String dummyProjectDir = '/b/'
     when:
     dockerExtension.dev {
       containerDependenciesDir dummyDependencyDir
-      containerBuildDir dummyBuildDir
+      containerProjectDir dummyProjectDir
     }
     then:
     dockerExtension.getDevExtension().containerDependenciesPath == dummyDependencyDir
-    dockerExtension.getDevExtension().containerBuildPath == dummyBuildDir
+    dockerExtension.getDevExtension().containerProjectPath == dummyProjectDir
 
 
   }
