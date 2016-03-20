@@ -4,23 +4,24 @@ import groovy.json.JsonSlurper
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import static pl.greenpath.gradle.BuildscriptClasspathDefinitionGenerator.generateBuildscriptClasspathDefinition
 
 class DockerBootRunTaskFunctionalTest extends Specification {
 
-  @Rule
-  final TemporaryFolder testProjectDir = new TemporaryFolder()
-
   File buildFile
 
+  File testAppgitDirectory = new File(getClass().getResource('/testApp').toURI())
+
   def setup() {
-    def settingsFile = testProjectDir.newFile('settings.gradle')
+    File settingsFile = new File(testAppDirectory, 'settings.gradle')
+    settingsFile.deleteOnExit()
+    settingsFile.createNewFile()
     settingsFile << "rootProject.name = 'myProject'"
-    buildFile = testProjectDir.newFile('testApp.build.gradle')
+    buildFile = new File(testAppDirectory, 'build.gradle')
+    buildFile.createNewFile()
+    buildFile.deleteOnExit()
     buildFile << generateBuildscriptClasspathDefinition()
   }
 
@@ -53,7 +54,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     '''
     when:
     BuildResult result = GradleRunner.create()
-        .withProjectDir(new File(getClass().getResource('/testApp').toURI()))
+        .withProjectDir(testAppDirectory)
         .withDebug(true)
         .withArguments('dockerRemoveImage', 'clean', 'build', 'dockerBootRun', '--stacktrace')
         .build()
