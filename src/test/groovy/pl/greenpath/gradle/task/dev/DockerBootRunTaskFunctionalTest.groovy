@@ -54,6 +54,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     when:
     BuildResult result = GradleRunner.create()
         .withProjectDir(new File(getClass().getResource('/testApp').toURI()))
+        .withDebug(true)
         .withArguments('dockerRemoveImage', 'clean', 'build', 'dockerBootRun', '--stacktrace')
         .build()
     then:
