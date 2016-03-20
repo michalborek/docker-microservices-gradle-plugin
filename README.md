@@ -95,3 +95,31 @@ is dependent on any other. as `linkedMicroservices` value you can set:
 
 
 Feel free to post feature requests and bugs using GitHub.
+
+Hot swap functionality
+----------------------
+
+To enable hot swap you need to add springloaded package to buildscript classpath:
+
+    buildscript {
+      repositories {
+        mavenCentral()
+      }
+      dependencies {
+        classpath('org.springframework:springloaded:1.2.5.RELEASE')
+      }
+    }
+
+
+and enable hot swap:
+
+    docker {
+      dev {
+        enableHotSwap true
+      }
+    }
+
+Having done it you need to invoke **:dockerBootRun** task. 
+Java classes will be automatically reloaded as well as static resources.
+ 
+**Note:** In Intellij IDEA you need to enable auto-make of project or compile the class manually.
