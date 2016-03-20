@@ -19,7 +19,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     File settingsFile = new File(testAppDirectory, 'settings.gradle')
     settingsFile.deleteOnExit()
     settingsFile.createNewFile()
-    settingsFile << "rootProject.name = 'myProject'"
+    settingsFile << "rootProject.name = 'testApp'"
     buildFile = new File(testAppDirectory, 'build.gradle')
     buildFile.createNewFile()
     buildFile.deleteOnExit()
@@ -62,10 +62,8 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     then:
     result.tasks.first().outcome == TaskOutcome.SUCCESS
     Thread.sleep(1000)
-    Process process = new ProcessBuilder().command('docker', 'ps', '-a').start()
+    Process process = new ProcessBuilder().command('docker', 'inspect', 'testApp').start()
     process.waitFor() == 0
-    println process.errorStream.text
-    println process.inputStream.text
     new JsonSlurper().parse(process.inputStream)[0]['State']['ExitCode'] == 0
   }
 }
