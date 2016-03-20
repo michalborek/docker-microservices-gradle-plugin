@@ -31,7 +31,7 @@ class DockerBootRunTask extends DockerRunTask {
     String path = getDevExtension().getContainerDependenciesPath()
     List<String> springLoadedFiles = project.buildscript.configurations.
         getByName('classpath').resolvedConfiguration.resolvedArtifacts.find {
-      if (!it.getId().getComponentIdentifier() in ModuleComponentIdentifier) {
+      if (!(it.getId().getComponentIdentifier() instanceof ModuleComponentIdentifier)) {
         return false
       }
       ModuleComponentIdentifier identifier = it.getId().getComponentIdentifier() as ModuleComponentIdentifier
