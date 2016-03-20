@@ -96,8 +96,8 @@ is dependent on any other. as `linkedMicroservices` value you can set:
 
 Feel free to post feature requests and bugs using GitHub.
 
-Hot swap functionality
-----------------------
+Hot swap functionality (Experimental)
+-------------------------------------
 
 To enable hot swap you need to add springloaded package to buildscript classpath:
 
