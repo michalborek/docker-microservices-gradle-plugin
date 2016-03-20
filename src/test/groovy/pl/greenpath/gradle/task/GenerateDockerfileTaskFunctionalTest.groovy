@@ -41,9 +41,8 @@ class GenerateDockerfileTaskFunctionalTest extends Specification {
         .build()
     then:
     result.task(':generateDockerfile').outcome == SUCCESS
-    result.standardError.isEmpty()
 
-    def dockerfile = new File(testProjectDir.root, 'build/docker/Dockerfile')
+    File dockerfile = new File(testProjectDir.root, 'build/docker/Dockerfile')
     dockerfile.exists()
     dockerfile.text == '''FROM java:8
                 |EXPOSE 9090
@@ -70,8 +69,7 @@ class GenerateDockerfileTaskFunctionalTest extends Specification {
         .build()
     then:
     result.task(':generateDockerfile').outcome == SUCCESS
-    result.standardError.isEmpty()
-    def dockerfile = new File(testProjectDir.root, 'build/docker/Dockerfile')
+    File dockerfile = new File(testProjectDir.root, 'build/docker/Dockerfile')
     dockerfile.exists()
     dockerfile.text == '''
                 |FROM java:8
