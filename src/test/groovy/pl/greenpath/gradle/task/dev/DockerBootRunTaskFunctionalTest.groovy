@@ -29,6 +29,15 @@ class DockerBootRunTaskFunctionalTest extends Specification {
   def 'should run program with attached classpath'() {
     given:
     buildFile << '''
+      buildscript {
+        repositories {
+          jcenter()
+        }
+
+        dependencies {
+          classpath 'org.springframework:springloaded:1.2.5.RELEASE'
+        }
+      }
       apply plugin: 'pl.greenpath.gradle.docker.microservices'
       apply plugin: 'java'
       apply plugin: 'application'
@@ -57,6 +66,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     BuildResult result = GradleRunner.create()
         .withProjectDir(testAppDirectory)
         .withDebug(true)
+        .forwardOutput()
         .withArguments('dockerRemoveImage', 'clean', 'build', 'dockerBootRun', '--stacktrace')
         .build()
     then:

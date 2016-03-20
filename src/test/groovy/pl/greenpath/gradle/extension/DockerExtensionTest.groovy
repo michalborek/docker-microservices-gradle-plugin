@@ -198,10 +198,12 @@ class DockerExtensionTest extends Specification {
     dockerExtension.dev {
       containerDependenciesDir dummyDependencyDir
       containerProjectDir dummyProjectDir
+      enableHotSwap true
     }
     then:
     dockerExtension.getDevExtension().containerDependenciesPath == dummyDependencyDir
     dockerExtension.getDevExtension().containerProjectPath == dummyProjectDir
+    dockerExtension.getDevExtension().isHotSwapEnabled()
 
 
   }

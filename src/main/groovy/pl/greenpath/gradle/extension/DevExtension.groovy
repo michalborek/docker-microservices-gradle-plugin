@@ -6,6 +6,8 @@ class DevExtension {
 
   private String containerProjectPath = '/project/'
 
+  private boolean hotSwapEnabled
+
   void containerDependenciesDir(String containerDependenciesDir) {
     this.containerDependenciesPath = attachTrailingSlash(containerDependenciesDir)
   }
@@ -20,6 +22,14 @@ class DevExtension {
 
   String getContainerProjectPath() {
     return containerProjectPath
+  }
+
+  boolean isHotSwapEnabled() {
+    return hotSwapEnabled
+  }
+
+  void enableHotSwap(boolean enable = true) {
+    hotSwapEnabled = enable
   }
 
   private static String attachTrailingSlash(String value) {
