@@ -15,7 +15,7 @@ class BuildscriptClasspathDefinitionGenerator {
   private static String setupPluginClasspath() {
     def pluginClasspathResource = BuildscriptClasspathDefinitionGenerator.classLoader.findResource('plugin-classpath.txt')
     if (pluginClasspathResource == null) {
-      throw new IllegalStateException('Did not find plugin classpath resource, run `testClasses` build task.')
+      throw new IllegalStateException('Did not find plugin classpath resource, run `testClasses` testApp.build task.')
     }
 
     return pluginClasspathResource.readLines()

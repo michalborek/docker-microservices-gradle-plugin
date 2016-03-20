@@ -3,5 +3,12 @@ language: groovy
 jdk:
 - oraclejdk8
 
+sudo: required
+
+services:
+  - docker
+
+script: ./gradlew test -i
+
 after_success:
 - ./gradlew jacocoTestReport coveralls

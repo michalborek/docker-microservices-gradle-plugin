@@ -2,6 +2,7 @@ package pl.greenpath.gradle.task
 
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskAction
+import pl.greenpath.gradle.extension.DockerExtension
 
 abstract class AbstractDockerTask extends Exec {
 
@@ -16,28 +17,32 @@ abstract class AbstractDockerTask extends Exec {
   @TaskAction
   protected final void exec() {
     prepareExecution()
-    setExecutable(getExecutable());
+    setExecutable(executable);
     super.exec()
   }
 
   @Override
   String getExecutable() {
-    return project.extensions.docker.executable
+    return dockerExtension.executable
   }
 
   protected String getContainerName() {
-    def containerName = project.extensions.docker.containerName;
+    String containerName = dockerExtension.containerName;
     return containerName ?: project.name.replaceAll('/', '-')
   }
 
   protected String getImageName() {
-    def imageName = project.extensions.docker.imageName;
+    String imageName = dockerExtension.imageName;
     return imageName ?: project.name.replaceAll('/', '-')
   }
 
   protected String getPortMapping() {
-    def port = project.extensions.docker.port
+    int port = dockerExtension.port
     return "$port:$port"
+  }
+
+  protected DockerExtension getDockerExtension() {
+    return project.extensions.getByType(DockerExtension)
   }
 
 }

@@ -4,15 +4,19 @@ class DockerRunTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    args(['run'] + (project.extensions.docker.runDetached ? ['-d'] : []) +
-        (project.extensions.docker.port > 0 ? ['-p', getPortMapping()] : []) + getLinkedMicroservices() + project.extensions.docker.runExtraArgs +
+    args(['run'] + (dockerExtension.runDetached ? ['-d'] : []) +
+        (dockerExtension.port > 0 ? ['-p', portMapping] : []) + getLinkedMicroservices() + getRunExtraArgs() +
         ['--name=' + getContainerName(), getImageName()])
-    println 'Running container: ' + getContainerName() + ' args: ' + getArgs()
+    println 'Running container: ' + containerName + ' args: ' + args
+  }
+
+  protected List<String> getRunExtraArgs() {
+    return dockerExtension.runExtraArgs
   }
 
   private List<String> getLinkedMicroservices() {
-    return project.extensions.docker.linkedMicroservices.collect {
-      def linkName = it.replaceAll('/', '-')
+    return dockerExtension.linkedMicroservices.collect {
+      String linkName = it.replaceAll('/', '-')
       "--link=$linkName:$linkName"
     }
   }
