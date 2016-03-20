@@ -12,9 +12,10 @@ class DockerBootRunTaskFunctionalTest extends Specification {
 
   File buildFile
 
-  File testAppgitDirectory = new File(getClass().getResource('/testApp').toURI())
+  File testAppDirectory
 
   def setup() {
+    File testAppDirectory = new File(getClass().getResource('/testApp').toURI())
     File settingsFile = new File(testAppDirectory, 'settings.gradle')
     settingsFile.deleteOnExit()
     settingsFile.createNewFile()

@@ -8,5 +8,7 @@ sudo: required
 services:
   - docker
 
+script: ./gradlew test -i
+
 after_success:
 - ./gradlew jacocoTestReport coveralls
