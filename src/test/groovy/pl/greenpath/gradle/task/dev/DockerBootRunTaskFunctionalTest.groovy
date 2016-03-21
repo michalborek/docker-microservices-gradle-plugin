@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static pl.greenpath.gradle.BuildscriptClasspathDefinitionGenerator.generateBuildscriptClasspathDefinition
@@ -26,6 +27,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     buildFile << generateBuildscriptClasspathDefinition()
   }
 
+  @Ignore
   def 'should run program with attached classpath'() {
     given:
     buildFile << '''
