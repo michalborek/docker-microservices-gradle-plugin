@@ -4,13 +4,13 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import pl.greenpath.gradle.extension.DevExtension
 import pl.greenpath.gradle.task.DockerRunTask
 
+// TODO this class is just a proof of concept. Rewrite it!
 class DockerBootRunTask extends DockerRunTask {
 
   static final String CLASSPATH_SEPARATOR = ':'
 
   static final String MAIN_CLASS_NAME_PROPERTY = 'mainClassName'
-  public static final int MAX_ARGUMENT_SIZE = 8192
-  public static final String PROJECT_CLASSPATH = 'PROJECT_CLASSPATH'
+  public static final int MAX_ARGUMENT_SIZE = 4 * 1024
 
   @Override
   protected String getImageName() {
@@ -20,40 +20,49 @@ class DockerBootRunTask extends DockerRunTask {
   @Override
   protected void prepareExecution() {
     super.prepareExecution()
-    args(['sh', '-c', constructJavaCommand()])
+    args(['sh', '-c', "java \${MS_JAVA_OPTS} ${getJavaAgentDefinition()} -cp ${getClasspathVars()} ${mainClassName()}"])
   }
 
-  private String constructJavaCommand() {
-    String javaCommand = 'java ${MS_JAVA_OPTS} '
+  private String getJavaAgentDefinition() {
     String springLoadedFile = findSpringLoaded()
-    if (springLoadedFile != null && getDevExtension().isHotSwapEnabled()) {
-      javaCommand += '-javaagent:' + springLoadedFile + ' -noverify '
+    if (!(springLoadedFile != null && getDevExtension().isHotSwapEnabled())) {
+      return ''
     }
-    return javaCommand + "-cp \${$PROJECT_CLASSPATH} " + mainClassName()
+    return '-javaagent:' + springLoadedFile + ' -noverify '
   }
 
   private List<String> getClasspathEnvArgs() {
-    LinkedList<String> classPath = sourceClassPath() + resourcesPath() + dependenciesClassPath() +
-        sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath() + sourceClassPath() + resourcesPath() + dependenciesClassPath()
-    List<List<String>> classPathsPartitioned = collateClasspath(classPath)
+    LinkedList<String> classPathPartitioned = getClassPathPartitioned()
     List<String> envArgs = []
-    List<String> classPathVariables = []
-    for (int i = 0; i < classPathsPartitioned.size(); i++) {
-      String classpathPart = classPathsPartitioned[i].join(CLASSPATH_SEPARATOR)
+    for (int i = 0; i < classPathPartitioned.size(); i++) {
+      String classpathPart = classPathPartitioned[i].join(CLASSPATH_SEPARATOR)
       envArgs << '-e' << "CP$i=$classpathPart"
-      classPathVariables << "\${CP${i}}"
     }
-    envArgs << '-e' << "$PROJECT_CLASSPATH=${classPathVariables.join(CLASSPATH_SEPARATOR)}"
     return envArgs
   }
 
+  private String getClasspathVars() {
+    List<List<String>> classPathsPartitioned = getClassPathPartitioned()
+    List<String> classPathVariables = []
+    for (int i = 0; i < classPathsPartitioned.size(); i++) {
+      classPathVariables << "\${CP${i}}"
+    }
+    return classPathVariables.join(CLASSPATH_SEPARATOR)
+  }
+
+  private List<List<String>> getClassPathPartitioned() {
+    LinkedList<String> classPath = sourceClassPath() + resourcesPath() + dependenciesClassPath()
+    List<List<String>> classPathsPartitioned = collateClasspath(classPath)
+    return classPathsPartitioned
+  }
+
   public static List<List<String>> collateClasspath(List<String> list) {
-    long sum = list.collect { it.length() }.sum() + list.size()
-    if (sum < MAX_ARGUMENT_SIZE) {
+    long argumentLength = list.collect { it.length() }.sum() + list.size()
+    if (argumentLength < MAX_ARGUMENT_SIZE) {
       return [list]
     }
-    int collateFactor = Math.floor((double) list.size() / ((double) sum / (double) MAX_ARGUMENT_SIZE))
-    List<List<List<String>>> result = []
+    int collateFactor = Math.floor((double) list.size() / ((double) argumentLength / (double) MAX_ARGUMENT_SIZE))
+    List<List<String>> result = []
     list.collate(collateFactor).collect {
       DockerBootRunTask.collateClasspath(it)
     }.forEach {
@@ -61,7 +70,6 @@ class DockerBootRunTask extends DockerRunTask {
     }
     return result
   }
-
 
   private String findSpringLoaded() {
     File gradleHomeDir = project.getGradle().getGradleUserHomeDir()
