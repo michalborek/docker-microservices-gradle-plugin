@@ -32,28 +32,27 @@ class DockerBootRunTask extends DockerRunTask {
   }
 
   private List<String> getClasspathEnvArgs() {
-    LinkedList<String> classPathPartitioned = getClassPathPartitioned()
+    List<String> classPathPartitioned = getClassPathPartitioned()
     List<String> envArgs = []
     for (int i = 0; i < classPathPartitioned.size(); i++) {
       String classpathPart = classPathPartitioned[i].join(CLASSPATH_SEPARATOR)
-      envArgs << '-e' << "CP$i=$classpathPart"
+      envArgs << '-e' << "CP${i}=${classpathPart}"
     }
     return envArgs
   }
 
   private String getClasspathVars() {
-    List<List<String>> classPathsPartitioned = getClassPathPartitioned()
+    List<List<String>> classPathPartitioned = getClassPathPartitioned()
     List<String> classPathVariables = []
-    for (int i = 0; i < classPathsPartitioned.size(); i++) {
+    for (int i = 0; i < classPathPartitioned.size(); i++) {
       classPathVariables << "\${CP${i}}"
     }
     return classPathVariables.join(CLASSPATH_SEPARATOR)
   }
 
   private List<List<String>> getClassPathPartitioned() {
-    LinkedList<String> classPath = sourceClassPath() + resourcesPath() + dependenciesClassPath()
-    List<List<String>> classPathsPartitioned = collateClasspath(classPath)
-    return classPathsPartitioned
+    List<String> classPath = sourceClassPath() + resourcesPath() + dependenciesClassPath()
+    return collateClasspath(classPath)
   }
 
   public static List<List<String>> collateClasspath(List<String> list) {
