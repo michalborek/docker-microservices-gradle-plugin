@@ -32,9 +32,7 @@ class DockerPlugin implements Plugin<Project> {
 
     project.task('generateDockerfile', type: GenerateDockerfileTask)
     project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
-      from(new File(project.buildDir, 'libs')) {
-        include "${project.name}-${project.version}.jar"
-      }
+      from { project.jar.archivePath }
       into new File(project.buildDir, 'docker')
     }
     project.task('dockerStop', type: DockerStopTask)
