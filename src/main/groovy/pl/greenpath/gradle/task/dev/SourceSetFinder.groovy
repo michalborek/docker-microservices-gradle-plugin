@@ -1,10 +1,12 @@
 package pl.greenpath.gradle.task.dev
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 
+@CompileStatic
 public class SourceSetFinder {
 
   private Project project

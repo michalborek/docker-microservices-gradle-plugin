@@ -24,8 +24,6 @@ import pl.greenpath.gradle.task.dev.DockerBootRunTask
  */
 class DockerPlugin implements Plugin<Project> {
 
-  public static final String DOCKERFILE = 'dockerfile'
-
   @Override
   void apply(Project project) {
     attachExtensions project
@@ -55,7 +53,7 @@ class DockerPlugin implements Plugin<Project> {
   protected void configureDependantTasks(Project project) {
     project.getTasksByName('dockerRun', false).each {
       it.dependsOn project.extensions['docker']['linkedMicroservices'].collect {
-        project.getRootProject().findProject(it).getTasksByName('dockerRun', false)
+        project.getRootProject().findProject(it as String).getTasksByName('dockerRun', false)
       }
     }
   }

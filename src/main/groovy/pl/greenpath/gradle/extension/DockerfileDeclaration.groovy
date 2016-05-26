@@ -1,7 +1,9 @@
 package pl.greenpath.gradle.extension
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 
+@CompileStatic
 class DockerfileDeclaration {
 
   private List<String> toCopy = []
@@ -53,7 +55,7 @@ class DockerfileDeclaration {
   }
 
   void expose(int ... ports) {
-    ports.each { expose it }
+    ports.each { expose it as int }
   }
 
   void volume(String volumes) {
@@ -92,15 +94,15 @@ class DockerfileDeclaration {
   }
 
   private static String printIfPresent(String commandName, String command) {
-    command == null ? '' : "$commandName $command\n"
+    return command == null ? '' : "$commandName $command\n"
   }
 
   private static String printListIfPresent(String commandName, List<String> commands) {
-    commands.isEmpty() ? '' : commands.collect { "$commandName $it" }.join('\n') << '\n'
+    return commands.isEmpty() ? '' : commands.collect { "$commandName $it" }.join('\n') << '\n'
   }
 
   private static String printExposeList(List<Integer> ports) {
-    ports.isEmpty() ? '' : "EXPOSE ${ports.join(' ')}" << '\n'
+    return ports.isEmpty() ? '' : "EXPOSE ${ports.join(' ')}" << '\n'
   }
 
 }

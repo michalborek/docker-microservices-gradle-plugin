@@ -1,10 +1,13 @@
 package pl.greenpath.gradle.task.dev
 
+import groovy.transform.CompileStatic
+import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import pl.greenpath.gradle.extension.DevExtension
 import pl.greenpath.gradle.task.DockerRunTask
 
 // TODO this class is just a proof of concept. Rewrite it!
+@CompileStatic
 class DockerBootRunTask extends DockerRunTask {
 
   static final String CLASSPATH_SEPARATOR = ':'
@@ -32,7 +35,7 @@ class DockerBootRunTask extends DockerRunTask {
   }
 
   private List<String> getClasspathEnvArgs() {
-    List<String> classPathPartitioned = getClassPathPartitioned()
+    List<List<String>> classPathPartitioned = getClassPathPartitioned()
     List<String> envArgs = []
     for (int i = 0; i < classPathPartitioned.size(); i++) {
       String classpathPart = classPathPartitioned[i].join(CLASSPATH_SEPARATOR)
@@ -63,7 +66,7 @@ class DockerBootRunTask extends DockerRunTask {
     int collateFactor = Math.floor((double) list.size() / ((double) argumentLength / (double) MAX_ARGUMENT_SIZE))
     List<List<String>> result = []
     list.collate(collateFactor).collect {
-      DockerBootRunTask.collateClasspath(it)
+      collateClasspath(it)
     }.forEach {
       result.addAll(it)
     }
@@ -81,7 +84,8 @@ class DockerBootRunTask extends DockerRunTask {
       ModuleComponentIdentifier identifier = it.getId().getComponentIdentifier() as ModuleComponentIdentifier
       return identifier.getGroup() == 'org.springframework' && identifier.getModule() == 'springloaded'
     }.collect {
-      DockerBootRunTask.switchToRelative(gradleHomeDir, dependenciesPath, it.getFile())
+      ResolvedArtifact resolvedArtifact = it as ResolvedArtifact
+      switchToRelative(gradleHomeDir, dependenciesPath, resolvedArtifact.getFile())
     }
     return springLoadedFiles.isEmpty() ? null : springLoadedFiles.first()
   }
@@ -95,11 +99,11 @@ class DockerBootRunTask extends DockerRunTask {
   }
 
   private String getProjectDir() {
-    getDevExtension().getHostRootProjectPath() ?: project.getRootDir().absolutePath
+    return getDevExtension().getHostRootProjectPath() ?: project.getRootDir().absolutePath
   }
 
   private String getGradleHomeDir() {
-    getDevExtension().getHostDependenciesPath() ?: project.getGradle().getGradleUserHomeDir().absolutePath
+    return getDevExtension().getHostDependenciesPath() ?: project.getGradle().getGradleUserHomeDir().absolutePath
   }
 
   private List<String> dependenciesClassPath() {
@@ -109,10 +113,10 @@ class DockerBootRunTask extends DockerRunTask {
     return new SourceSetFinder(project).findMainSourceSet().runtimeClasspath.filter {
       it.isFile()
     }.collect {
-      if (it.absolutePath.startsWith(gradleHomeDir.absolutePath)) {
-        DockerBootRunTask.switchToRelative(gradleHomeDir, containerPath, it)
+      if ((it as File).absolutePath.startsWith(gradleHomeDir.absolutePath)) {
+        switchToRelative(gradleHomeDir, containerPath, it)
       } else {
-        DockerBootRunTask.switchToRelative(project.getRootDir(), projectPath, it)
+        switchToRelative(project.getRootDir(), projectPath, it)
       }
     }
   }
@@ -128,19 +132,19 @@ class DockerBootRunTask extends DockerRunTask {
     Set<File> resourcesDirs = new SourceSetFinder(project).findMainSourceSet().getResources().srcDirs
 
     return resourcesDirs.collect {
-      DockerBootRunTask.switchToRelative(project.getRootDir(), projectPath, it)
+      switchToRelative(project.getRootDir(), projectPath, it)
     }
   }
 
   private String mainClassName() {
-    if (project.hasProperty(MAIN_CLASS_NAME_PROPERTY) == null) {
-      throw new IllegalStateException("MainClass not set")
+    if (!project.hasProperty(MAIN_CLASS_NAME_PROPERTY)) {
+      throw new IllegalStateException('MainClass not set')
     }
     return project.getProperties().get(MAIN_CLASS_NAME_PROPERTY)
   }
 
   private DevExtension getDevExtension() {
-    getDockerExtension().getDevExtension()
+    return getDockerExtension().getDevExtension()
   }
 
   public static String switchToRelative(File relativeTo, String destinationPath, File file) {

@@ -97,7 +97,7 @@ class DockerExtension {
     if (relativeProjectDirPath.isEmpty())
       return fixedRootProjectPath
 
-    fixedRootProjectPath + '/' + relativeProjectDirPath
+    return fixedRootProjectPath + '/' + relativeProjectDirPath
   }
 
   String replaceMarkerWithProjectPathMappedToFixedRoot(String pathWithMarker) {
@@ -110,7 +110,7 @@ class DockerExtension {
       return pathWithMarker.replaceFirst(projectDirMarker, getProjectDirPathOnDockerHost())
     }
 
-    pathWithMarker
+    return pathWithMarker
   }
 
   String replaceMarkerWithRealPath(String pathWithMarker) {
@@ -123,7 +123,7 @@ class DockerExtension {
       return pathWithMarker.replaceFirst(projectDirMarker, project.projectDir.toString())
     }
 
-    pathWithMarker
+    return pathWithMarker
   }
 
   void bindMount(String srcPath, String dstPath) {
@@ -237,7 +237,7 @@ class DockerExtension {
 
 
   static Closure<DockerfileDeclaration> microserviceTemplate = {
-    def jarFile = "${project.name}-${project.version}.jar"
+    String jarFile = "${project.name}-${project.version}.jar"
     from 'java:8'
     add jarFile, '.'
     cmd "java -jar $jarFile"

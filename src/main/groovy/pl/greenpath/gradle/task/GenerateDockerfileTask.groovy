@@ -1,10 +1,13 @@
 package pl.greenpath.gradle.task
 
+import groovy.transform.CompileStatic
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import pl.greenpath.gradle.extension.DockerExtension
 import pl.greenpath.gradle.extension.DockerfileDeclaration
 
+@CompileStatic
 class GenerateDockerfileTask extends AbstractTask {
 
   public static final String GROUP_NAME = 'docker'
@@ -15,7 +18,7 @@ class GenerateDockerfileTask extends AbstractTask {
 
   @TaskAction
   def executeTask() {
-    if (!getProject().extensions['docker'].shouldGenerateDockerfile()) {
+    if (!getProject().getExtensions().getByType(DockerExtension).shouldGenerateDockerfile()) {
       println 'Dockerfile generation disabled.'
       return
     }
@@ -25,7 +28,7 @@ class GenerateDockerfileTask extends AbstractTask {
     } else {
       getDockerDirectory().mkdirs()
     }
-    DockerfileDeclaration declaration = getProject().extensions['docker']['dockerfile']
+    DockerfileDeclaration declaration = getProject().getExtensions().getByType(DockerExtension).getDockerfile()
     dockerfile << declaration.toDockerfile()
   }
 

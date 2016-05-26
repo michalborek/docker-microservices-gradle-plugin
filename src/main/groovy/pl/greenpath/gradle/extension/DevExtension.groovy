@@ -1,5 +1,8 @@
-package pl.greenpath.gradle.extension;
+package pl.greenpath.gradle.extension
 
+import groovy.transform.CompileStatic;
+
+@CompileStatic
 class DevExtension {
 
   private String containerDependenciesPath = '/dependencies/'

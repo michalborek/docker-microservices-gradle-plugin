@@ -1,5 +1,8 @@
 package pl.greenpath.gradle.task
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class DockerRemoveContainerTask extends AbstractDockerTask {
 
   public DockerRemoveContainerTask() {

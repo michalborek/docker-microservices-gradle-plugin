@@ -1,9 +1,12 @@
 package pl.greenpath.gradle.task
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class DockerStopTask extends AbstractDockerTask {
 
   public DockerStopTask() {
-    ignoreExitValue true
+    setIgnoreExitValue true
   }
 
   @Override

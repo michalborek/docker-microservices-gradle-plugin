@@ -1,9 +1,11 @@
 package pl.greenpath.gradle.task
 
+import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskAction
 import pl.greenpath.gradle.extension.DockerExtension
 
+@CompileStatic
 abstract class AbstractDockerTask extends Exec {
 
   public static final String GROUP_NAME = 'docker'
