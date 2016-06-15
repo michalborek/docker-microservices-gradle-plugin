@@ -1,5 +1,7 @@
 package pl.greenpath.gradle
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -22,6 +24,7 @@ import pl.greenpath.gradle.task.dev.DockerBootRunTask
  * This file is copied along with a jar generated in "libs" directory into 'build/docker' directory.
  * All operations on docker are invoked on that directory.</p>
  */
+@CompileStatic
 class DockerPlugin implements Plugin<Project> {
 
   @Override
@@ -29,12 +32,7 @@ class DockerPlugin implements Plugin<Project> {
     attachExtensions project
 
     project.task('generateDockerfile', type: GenerateDockerfileTask)
-    project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
-      from(new File(project.buildDir, 'libs')) {
-        include "${project.name}-${project.version}.jar"
-      }
-      into new File(project.buildDir, 'docker')
-    }
+    createCopyJarToDockerDirTask(project)
     project.task('dockerStop', type: DockerStopTask)
     project.task('dockerLogs', type: DockerInteractiveLogTask)
     project.task('dockerRun', type: DockerRunTask, dependsOn: 'dockerBuild')
@@ -50,7 +48,17 @@ class DockerPlugin implements Plugin<Project> {
     }
   }
 
-  protected void configureDependantTasks(Project project) {
+  @CompileDynamic
+  private void createCopyJarToDockerDirTask(Project project) {
+    project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
+      from(new File(project.buildDir, 'libs')) {
+        include "${project.name}-${project.version}.jar"
+      }
+      into new File(project.buildDir, 'docker')
+    }
+  }
+
+  protected static void configureDependantTasks(Project project) {
     project.getTasksByName('dockerRun', false).each {
       it.dependsOn project.extensions['docker']['linkedMicroservices'].collect {
         project.getRootProject().findProject(it as String).getTasksByName('dockerRun', false)
