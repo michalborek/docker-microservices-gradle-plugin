@@ -30,7 +30,6 @@ class DockerPlugin implements Plugin<Project> {
   @Override
   void apply(Project project) {
     attachExtensions project
-
     project.task('generateDockerfile', type: GenerateDockerfileTask)
     createCopyJarToDockerDirTask(project)
     project.task('dockerStop', type: DockerStopTask)
@@ -51,9 +50,7 @@ class DockerPlugin implements Plugin<Project> {
   @CompileDynamic
   private void createCopyJarToDockerDirTask(Project project) {
     project.task('copyJarToDockerDir', type: Copy, dependsOn: 'assemble') {
-      from(new File(project.buildDir, 'libs')) {
-        include "${project.name}-${project.version}.jar"
-      }
+      from { project.jar.archivePath }
       into new File(project.buildDir, 'docker')
     }
   }
