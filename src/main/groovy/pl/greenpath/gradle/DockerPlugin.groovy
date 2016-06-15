@@ -30,7 +30,6 @@ class DockerPlugin implements Plugin<Project> {
   @Override
   void apply(Project project) {
     attachExtensions project
-
     project.task('generateDockerfile', type: GenerateDockerfileTask)
     createCopyJarToDockerDirTask(project)
     project.task('dockerStop', type: DockerStopTask)
