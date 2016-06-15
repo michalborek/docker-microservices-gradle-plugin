@@ -39,7 +39,7 @@ class DockerBootRunTask extends DockerRunTask {
     List<String> envArgs = []
     for (int i = 0; i < classPathPartitioned.size(); i++) {
       String classpathPart = classPathPartitioned[i].join(CLASSPATH_SEPARATOR)
-      envArgs << '-e' << "CP${i}=${classpathPart}"
+      envArgs << '-e' << "CP${i}=${classpathPart}".toString()
     }
     return envArgs
   }
@@ -48,7 +48,7 @@ class DockerBootRunTask extends DockerRunTask {
     List<List<String>> classPathPartitioned = getClassPathPartitioned()
     List<String> classPathVariables = []
     for (int i = 0; i < classPathPartitioned.size(); i++) {
-      classPathVariables << "\${CP${i}}"
+      classPathVariables << "\${CP${i}}".toString()
     }
     return classPathVariables.join(CLASSPATH_SEPARATOR)
   }
@@ -59,16 +59,16 @@ class DockerBootRunTask extends DockerRunTask {
   }
 
   public static List<List<String>> collateClasspath(List<String> list) {
-    long argumentLength = list.collect { it.length() }.sum() + list.size()
+    long argumentLength = (list.<String, Long> collect { it.length() }.sum() as Long) + list.size()
     if (argumentLength < MAX_ARGUMENT_SIZE) {
       return [list]
     }
-    int collateFactor = Math.floor((double) list.size() / ((double) argumentLength / (double) MAX_ARGUMENT_SIZE))
+    int collateFactor = Math.floor((double) list.size() / ((double) argumentLength / (double) MAX_ARGUMENT_SIZE)) as int
     List<List<String>> result = []
     list.collate(collateFactor).collect {
       collateClasspath(it)
     }.forEach {
-      result.addAll(it)
+      result.addAll(it as List<List<String>>)
     }
     return result
   }
@@ -111,12 +111,13 @@ class DockerBootRunTask extends DockerRunTask {
     String projectPath = getDevExtension().getContainerProjectPath()
     String containerPath = getDevExtension().getContainerDependenciesPath()
     return new SourceSetFinder(project).findMainSourceSet().runtimeClasspath.filter {
-      it.isFile()
+      (it as File).isFile()
     }.collect {
-      if ((it as File).absolutePath.startsWith(gradleHomeDir.absolutePath)) {
-        switchToRelative(gradleHomeDir, containerPath, it)
+      File file = it as File
+      if (file.absolutePath.startsWith(gradleHomeDir.absolutePath)) {
+        switchToRelative(gradleHomeDir, containerPath, file)
       } else {
-        switchToRelative(project.getRootDir(), projectPath, it)
+        switchToRelative(project.getRootDir(), projectPath, file)
       }
     }
   }

@@ -33,15 +33,15 @@ class DockerfileDeclaration {
   }
 
   void env(String key, String value) {
-    environmentalVariables << "$key $value"
+    environmentalVariables << "$key $value".toString()
   }
 
   void add(String source, String destination) {
-    toAdd << "$source $destination"
+    toAdd << "$source $destination".toString()
   }
 
   void copy(String source, String destination) {
-    toCopy << "$source $destination"
+    toCopy << "$source $destination".toString()
   }
 
   void workdir(String workingDir) {

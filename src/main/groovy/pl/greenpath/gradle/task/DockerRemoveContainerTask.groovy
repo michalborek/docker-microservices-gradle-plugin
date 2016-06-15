@@ -1,6 +1,7 @@
 package pl.greenpath.gradle.task
 
 import groovy.transform.CompileStatic
+import pl.greenpath.gradle.extension.DockerExtension
 
 @CompileStatic
 class DockerRemoveContainerTask extends AbstractDockerTask {
@@ -11,7 +12,16 @@ class DockerRemoveContainerTask extends AbstractDockerTask {
 
   @Override
   protected void prepareExecution() {
-    args(['rm'] + (project.extensions.docker.removeVolumes ? ['-v'] : []) + [getContainerName()])
+    args(getArgumentList())
     println 'Removing container: ' + getContainerName()
+  }
+
+  private List<String> getArgumentList() {
+    List<String> arguments = ['rm']
+    if (project.extensions.getByType(DockerExtension).removeVolumes) {
+      arguments += '-v'
+    }
+    arguments += getContainerName()
+    return arguments
   }
 }
