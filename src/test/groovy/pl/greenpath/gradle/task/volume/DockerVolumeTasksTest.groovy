@@ -3,8 +3,11 @@ package pl.greenpath.gradle.task.volume
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.greenpath.gradle.DockerPlugin
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
+// not supported by travis
 class DockerVolumeTasksTest extends Specification {
 
   Project rootProject
