@@ -1,0 +1,64 @@
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'com.gradle.publish:plugin-publish-plugin:0.9.3'
+  }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'com.gradle.plugin-publish'
+
+repositories {
+  jcenter()
+}
+
+// Write the plugin's classpath to a file to share with the tests
+task createClasspathManifest {
+  def outputDir = file("$buildDir/$name")
+
+  inputs.files sourceSets.main.runtimeClasspath
+  outputs.dir outputDir
+
+  doLast {
+    outputDir.mkdirs()
+    file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join('\n')
+  }
+}
+
+dependencies {
+  compile gradleApi()
+  compile 'org.codehaus.groovy:groovy-all:2.4.4'
+  compile 'commons-lang:commons-lang:2.6'
+
+  testCompile gradleTestKit()
+  testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+  testRuntime files(createClasspathManifest)
+}
+
+version = '0.1.9'
+group = 'pl.greenpath.gradle'
+
+pluginBundle {
+  website = 'https://github.com/michalborek/bower-to-prod-gradle-plugin'
+  vcsUrl = 'https://github.com/michalborek/bower-to-prod-gradle-plugin'
+  description = '''Bower to production gradle plugin copies only production files to desired directory.
+                   It skips all the samples, README files and so on. Production files are recognized by 'main' section
+                   in bower.json or by custom definition'''
+  tags = ['bower', 'javascript']
+
+  plugins {
+    greetingsPlugin {
+      id = 'pl.greenpath.gradle.bowertoprod'
+      displayName = 'Bower to production gradle plugin'
+    }
+  }
+}
+
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.11'
+}
