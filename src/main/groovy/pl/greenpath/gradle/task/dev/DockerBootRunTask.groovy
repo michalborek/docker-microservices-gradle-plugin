@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import pl.greenpath.gradle.extension.DevExtension
+import pl.greenpath.gradle.extension.DockerExtension
 import pl.greenpath.gradle.task.DockerRunTask
 
 // TODO this class is just a proof of concept. Rewrite it!
@@ -17,7 +18,7 @@ class DockerBootRunTask extends DockerRunTask {
 
   @Override
   protected String getImageName() {
-    return 'java:8'
+    return project.getExtensions().getByType(DockerExtension).getDevExtension().getImageName()
   }
 
   @Override

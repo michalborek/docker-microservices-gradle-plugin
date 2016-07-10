@@ -116,8 +116,10 @@ and enable hot swap:
     docker {
       dev {
         enableHotSwap true
+        imageName 'imageName:version' // 'java:8' is default image name for hot swap runs
       }
     }
+    
 
 Having done it you need to invoke **:dockerBootRun** task. 
 Java classes will be automatically reloaded as well as static resources.

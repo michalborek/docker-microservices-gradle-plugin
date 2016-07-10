@@ -3,6 +3,8 @@ package pl.greenpath.gradle.extension
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 
+import java.util.function.Consumer
+
 @CompileStatic
 class DockerfileDeclaration {
 
@@ -17,15 +19,15 @@ class DockerfileDeclaration {
   private String volume
   private String userVariable
   private String command
-  private Project project
   private String stringBasedDockerfile
+  Project project
 
   DockerfileDeclaration(Project project) {
     this.project = project
   }
 
-  void template(Closure<DockerfileDeclaration> templateClosure) {
-    with templateClosure
+  void template(Consumer<DockerfileDeclaration> templateClosure) {
+    templateClosure.accept(this)
   }
 
   void from(String from) {

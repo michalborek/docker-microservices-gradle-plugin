@@ -7,6 +7,7 @@ import pl.greenpath.gradle.DockerPlugin
 import pl.greenpath.gradle.extension.DockerExtension
 import spock.lang.Specification
 
+
 class GenerateDockerfileTaskTest extends Specification {
 
   static final String GENERATE_DOCKERFILE_TASK_NAME = 'generateDockerfile'
@@ -19,26 +20,18 @@ class GenerateDockerfileTaskTest extends Specification {
 
   def setup() {
     rootProject = createTestProject()
-
     applyDockerPlugin(rootProject)
-
     generateDockerfileTask = findTask(rootProject, GENERATE_DOCKERFILE_TASK_NAME)
-
     createTemporaryBuildDirForProject()
   }
 
-  private applyDockerPlugin(Project rootProject) {
-    def plugin = new DockerPlugin()
-    plugin.apply(rootProject)
-  }
-
   Task findTask(Project project, String taskName) {
-    project.getTasksByName(taskName, false).first()
+    return project.getTasksByName(taskName, false).first()
   }
 
   Project createTestProject() {
     rootProject = ProjectBuilder.builder().withName(TEST_PROJECT_NAME).build()
-    rootProject
+    return rootProject
   }
 
   void createTemporaryBuildDirForProject() {
@@ -49,11 +42,11 @@ class GenerateDockerfileTaskTest extends Specification {
     given:
     rootProject.version = '1.1'
     rootProject.extensions['docker'].port 8082
-    rootProject.extensions.docker.dockerfile.with DockerExtension.microserviceTemplate
+    DockerExtension.microserviceTemplate.accept(rootProject.extensions.getByType(DockerExtension).dockerfile)
     when:
     generateDockerfileTask.executeTask()
     then:
-    def dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
+    File dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
     dockerfile.exists()
     dockerfile.getText('UTF-8') == '''FROM java:8
                                      |EXPOSE 8082
@@ -65,13 +58,14 @@ class GenerateDockerfileTaskTest extends Specification {
   def "should be able to redefine parameters after applying template"() {
     given:
     rootProject.version = '1.1'
-    rootProject.extensions.docker.port 8082
-    rootProject.extensions.docker.dockerfile.template DockerExtension.microserviceTemplate
-    rootProject.extensions.docker.dockerfile.add('testing', '.')
+    DockerExtension dockerExtension = rootProject.extensions.getByType(DockerExtension)
+    dockerExtension.port 8082
+    dockerExtension.dockerfile.template DockerExtension.microserviceTemplate
+    dockerExtension.dockerfile.add('testing', '.')
     when:
     generateDockerfileTask.executeTask()
     then:
-    def dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
+    File dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
     dockerfile.exists()
     dockerfile.getText('UTF-8') == '''FROM java:8
                                      |EXPOSE 8082
@@ -82,12 +76,12 @@ class GenerateDockerfileTaskTest extends Specification {
   }
 
   def "should generate Dockerfile with user defined base image when defined in extension"() {
-    rootProject.extensions.docker.dockerfile.from 'postgres:9.4'
+    rootProject.extensions.getByType(DockerExtension).dockerfile.from 'postgres:9.4'
     rootProject.version = '1.2'
     when:
     generateDockerfileTask.executeTask()
     then:
-    def dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
+    File dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
     dockerfile.exists()
     dockerfile.getText('UTF-8') == '''FROM postgres:9.4
                                      |'''.stripMargin()
@@ -95,11 +89,11 @@ class GenerateDockerfileTaskTest extends Specification {
 
   def "should generate Dockerfile with port defined in docker extension"() {
     rootProject.version = '1.2'
-    rootProject.extensions.docker.port 8080
+    rootProject.extensions.getByType(DockerExtension).port 8080
     when:
     generateDockerfileTask.executeTask()
     then:
-    def dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
+    File dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
     dockerfile.exists()
     dockerfile.getText('UTF-8') == '''EXPOSE 8080
                                      |'''.stripMargin()
@@ -107,12 +101,12 @@ class GenerateDockerfileTaskTest extends Specification {
 
   def "should replace content of file if already exists"() {
     rootProject.version = '1.2'
-    rootProject.extensions.docker.port 8080
+    rootProject.extensions.getByType(DockerExtension).port 8080
     when:
     generateDockerfileTask.executeTask()
     generateDockerfileTask.executeTask()
     then:
-    def dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
+    File dockerfile = new File(rootProject.buildDir, 'docker/Dockerfile')
     dockerfile.exists()
     dockerfile.getText('UTF-8') == '''EXPOSE 8080
                                      |'''.stripMargin()
@@ -121,10 +115,11 @@ class GenerateDockerfileTaskTest extends Specification {
   def "should skip dockerfile generation when generateDockerfile is set to false"() {
     given:
     rootProject.version = '1.1'
-    rootProject.extensions.docker.port 8082
-    rootProject.extensions.docker.dockerfile.template DockerExtension.microserviceTemplate
-    rootProject.extensions.docker.dockerfile.add('testing', '.')
-    rootProject.extensions.docker.generateDockerfile false
+    DockerExtension dockerExtension = rootProject.extensions.getByType(DockerExtension)
+    dockerExtension.port 8082
+    dockerExtension.dockerfile.template DockerExtension.microserviceTemplate
+    dockerExtension.dockerfile.add('testing', '.')
+    dockerExtension.generateDockerfile false
     when:
     generateDockerfileTask.executeTask()
     then:
@@ -132,12 +127,11 @@ class GenerateDockerfileTaskTest extends Specification {
     !dockerfile.exists()
   }
 
-
   def "should generate Dockerfile based on string representation passed as 'dockerfile' argument "() {
     given:
     rootProject.version = '1.1'
     rootProject.extensions['docker'].port 8082
-    rootProject.extensions.docker.dockerfile """FROM java:8
+    rootProject.extensions.getByType(DockerExtension).dockerfile """FROM java:8
                                                 EXPOSE 9091
                                                 CMD echo 'ok'
     """
@@ -150,5 +144,10 @@ class GenerateDockerfileTaskTest extends Specification {
                                      |EXPOSE 9091
                                      |CMD echo 'ok'
                                      |'''.stripMargin()
+  }
+
+  private static applyDockerPlugin(Project rootProject) {
+    DockerPlugin plugin = new DockerPlugin()
+    plugin.apply(rootProject)
   }
 }

@@ -18,10 +18,8 @@ class DockerExtensionTest extends Specification {
 
   def setup() {
     setupProjects()
-
     applyPluginToProjects()
-
-    dockerExtension = project.extensions['docker']
+    dockerExtension = project.extensions.getByType(DockerExtension)
   }
 
   def setupProjects() {
@@ -33,7 +31,7 @@ class DockerExtensionTest extends Specification {
   }
 
   def applyPluginToProjects() {
-    def plugin = new DockerPlugin()
+    DockerPlugin plugin = new DockerPlugin()
     plugin.apply(project)
     plugin.apply(childProject)
   }
@@ -95,10 +93,10 @@ class DockerExtensionTest extends Specification {
 
   def "should publish specified ports"() {
     given:
-    def hostPort1 = 123
-    def containerPort1 = 456
-    def hostPort2 = 22
-    def containerPort2 = 33
+    int hostPort1 = 123
+    int containerPort1 = 456
+    int hostPort2 = 22
+    int containerPort2 = 33
     when:
     dockerExtension.publishPort(hostPort1, containerPort1)
     dockerExtension.publishPort(hostPort2, containerPort2)
@@ -130,7 +128,7 @@ class DockerExtensionTest extends Specification {
 
   def "should not map docker host paths by default"() {
     expect:
-    project.extensions['docker'].mapProjectPathsToFixedRoot == false
+    !dockerExtension.mapProjectPathsToFixedRoot
   }
 
   def "should replace %rootProjectDir% marker if mapProjectPathsToFixedRoot is enabled"() {
@@ -158,7 +156,7 @@ class DockerExtensionTest extends Specification {
   def "should replace %projectDir% marker for child project if mapProjectPathsToFixedRoot is enabled"() {
     given:
     String rootProjectPath = '/proj'
-    dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions.getByType(DockerExtension)
     dockerExtension.mapProjectPathsToFixedRoot true
     dockerExtension.fixedRootProjectPath rootProjectPath
     when:
@@ -169,7 +167,7 @@ class DockerExtensionTest extends Specification {
 
   def "should replace %projectDir% marker with real projectDir for child project"() {
     given:
-    dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions.getByType(DockerExtension)
     dockerExtension.mapProjectPathsToFixedRoot false
     when:
     dockerExtension.bindMount('%projectDir%/some/path', '/dst')
@@ -180,7 +178,7 @@ class DockerExtensionTest extends Specification {
   @Unroll
   def "should set default value for #param dev extension attribute"() {
     given:
-    dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions.getByType(DockerExtension)
     expect:
     dockerExtension.getDevExtension()[param] == defaultValue
     where:
@@ -191,7 +189,7 @@ class DockerExtensionTest extends Specification {
 
   def "should allow defining own dependency path"() {
     given:
-    dockerExtension = childProject.extensions['docker']
+    dockerExtension = childProject.extensions.getByType(DockerExtension)
     String dummyDependencyDir = '/a/'
     String dummyProjectDir = '/b/'
     when:

@@ -7,13 +7,13 @@ import spock.lang.Specification
 
 class DockerfileDeclarationTest extends Specification {
 
-  def dockerfileDeclaration = new DockerfileDeclaration()
-
   Project project
+
+  DockerfileDeclaration dockerfileDeclaration = new DockerfileDeclaration(project)
 
   def setup() {
     project = ProjectBuilder.builder().withName('testProject').build()
-    def plugin = new DockerPlugin()
+    DockerPlugin plugin = new DockerPlugin()
     plugin.apply(project)
   }
 

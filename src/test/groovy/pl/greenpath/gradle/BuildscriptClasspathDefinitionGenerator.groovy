@@ -1,5 +1,6 @@
 package pl.greenpath.gradle
 
+
 class BuildscriptClasspathDefinitionGenerator {
 
   static String generateBuildscriptClasspathDefinition() {

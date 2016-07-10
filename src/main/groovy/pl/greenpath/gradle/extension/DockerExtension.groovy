@@ -1,7 +1,11 @@
 package pl.greenpath.gradle.extension
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 
+import java.util.function.Consumer
+
+@CompileStatic
 class DockerExtension {
 
   private String fixedRootProjectPath = '/project'
@@ -223,6 +227,10 @@ class DockerExtension {
     dockerfile.with closure
   }
 
+  void dockerfile(Consumer<DockerfileDeclaration> template) {
+    template.accept(dockerfile)
+  }
+
   void dev(Closure<DevExtension> closure) {
     devExtension.with closure
   }
@@ -236,10 +244,14 @@ class DockerExtension {
   }
 
 
-  static Closure<DockerfileDeclaration> microserviceTemplate = {
-    String jarFile = "${project.name}-${project.version}.jar"
-    from 'java:8'
-    add jarFile, '.'
-    cmd "java -jar $jarFile"
+  static Consumer<DockerfileDeclaration> microserviceTemplate = new Consumer<DockerfileDeclaration>() {
+    @Override
+    void accept(DockerfileDeclaration dockerfileDeclaration) {
+      String jarFile = "${dockerfileDeclaration.project.name}-${dockerfileDeclaration.project.version}.jar"
+      dockerfileDeclaration.from 'java:8'
+      dockerfileDeclaration.add jarFile, '.'
+      dockerfileDeclaration.cmd "java -jar $jarFile"
+    }
+
   }
 }

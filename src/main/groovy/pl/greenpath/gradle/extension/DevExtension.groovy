@@ -13,6 +13,8 @@ class DevExtension {
 
   private String hostRootProjectPath
 
+  private String baseImageName = 'java:8'
+
   private boolean hotSwapEnabled
 
   void containerDependenciesDir(String containerDependenciesDir) {
@@ -31,6 +33,11 @@ class DevExtension {
     this.hostDependenciesPath = dir
   }
 
+  void imageName(String name) {
+    this.baseImageName = name
+  }
+
+
   String getContainerDependenciesPath() {
     return containerDependenciesPath
   }
@@ -45,6 +52,10 @@ class DevExtension {
 
   String getHostRootProjectPath() {
     return hostRootProjectPath
+  }
+
+  String getImageName() {
+    return baseImageName
   }
 
   boolean isHotSwapEnabled() {
