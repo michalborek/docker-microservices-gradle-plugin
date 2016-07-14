@@ -1,9 +1,11 @@
 package pl.greenpath.gradle
 
+import groovy.transform.CompileStatic
 
-class BuildscriptClasspathDefinitionGenerator {
+@CompileStatic
+class BuildScriptClasspathDefinitionGenerator {
 
-  static String generateBuildscriptClasspathDefinition() {
+  static String generateBuildScriptClasspathDefinition() {
     return """
         buildscript {
             dependencies {
@@ -14,12 +16,12 @@ class BuildscriptClasspathDefinitionGenerator {
   }
 
   private static String setupPluginClasspath() {
-    def pluginClasspathResource = BuildscriptClasspathDefinitionGenerator.classLoader.findResource('plugin-classpath.txt')
-    if (pluginClasspathResource == null) {
+    URL classpathResource = BuildScriptClasspathDefinitionGenerator.classLoader.getResource('plugin-classpath.txt')
+    if (classpathResource == null) {
       throw new IllegalStateException('Did not find plugin classpath resource, run `testClasses` testApp.build task.')
     }
 
-    return pluginClasspathResource.readLines()
+    return classpathResource.readLines()
         .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
         .collect { "'$it'" }
         .join(', ')

@@ -6,7 +6,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Specification
 
-import static pl.greenpath.gradle.BuildscriptClasspathDefinitionGenerator.generateBuildscriptClasspathDefinition
+import static pl.greenpath.gradle.BuildScriptClasspathDefinitionGenerator.generateBuildScriptClasspathDefinition
 
 class DockerBootRunTaskFunctionalTest extends Specification {
 
@@ -23,7 +23,7 @@ class DockerBootRunTaskFunctionalTest extends Specification {
     buildFile = new File(testAppDirectory, 'build.gradle')
     buildFile.createNewFile()
     buildFile.deleteOnExit()
-    buildFile << generateBuildscriptClasspathDefinition()
+    buildFile << generateBuildScriptClasspathDefinition()
   }
 
   def 'should run program with attached classpath'() {

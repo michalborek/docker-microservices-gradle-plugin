@@ -7,7 +7,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import static pl.greenpath.gradle.BuildscriptClasspathDefinitionGenerator.generateBuildscriptClasspathDefinition
+import static pl.greenpath.gradle.BuildScriptClasspathDefinitionGenerator.generateBuildScriptClasspathDefinition
 
 class GenerateDockerfileTaskFunctionalTest extends Specification {
 
@@ -20,7 +20,7 @@ class GenerateDockerfileTaskFunctionalTest extends Specification {
     def settingsFile = testProjectDir.newFile('settings.gradle')
     settingsFile << "rootProject.name = 'myProject'"
     buildFile = testProjectDir.newFile('build.gradle')
-    buildFile << generateBuildscriptClasspathDefinition()
+    buildFile << generateBuildScriptClasspathDefinition()
     buildFile << "apply plugin: 'pl.greenpath.gradle.docker.microservices'"
   }
 
