@@ -49,7 +49,7 @@ dependencies {
   testRuntime files(createClasspathManifest)
 }
 
-version = '2.0.18'
+version = '2.0.19'
 group = 'pl.greenpath.gradle.dockermicroservices'
 
 pluginBundle {
